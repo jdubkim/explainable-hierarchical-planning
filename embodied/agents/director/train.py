@@ -2,9 +2,14 @@ import pathlib
 import sys
 import warnings
 
+import tensorflow as tf
+
 warnings.filterwarnings('ignore', '.*box bound precision lowered.*')
 warnings.filterwarnings('ignore', '.*using stateful random seeds*')
 warnings.filterwarnings('ignore', '.*is a deprecated alias for.*')
+
+physical_devices = tf.config.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 directory = pathlib.Path(__file__)
 try:
