@@ -3,3 +3,4 @@ __pycache__/
 *.egg-info
 dist
 MUJOCO_LOG.TXT
+slurm_outputs/*

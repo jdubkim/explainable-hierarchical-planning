@@ -1,7 +1,8 @@
 #!/bin/bash
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jk3417
+#SBATCH -output=train_director%j.output
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
 source /vol/cuda/11.4.120-cudnn8.2.4/setup.sh
