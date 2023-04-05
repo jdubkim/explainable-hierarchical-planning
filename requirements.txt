@@ -8,5 +8,5 @@ numpy
 opencv-python
 rich
 ruamel.yaml
-tensorflow
-tensorflow_probability
+tensorflow==2.8.2
+tensorflow_probability==0.16.0

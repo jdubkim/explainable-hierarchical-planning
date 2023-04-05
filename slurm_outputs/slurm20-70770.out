@@ -1,0 +1,842 @@
+Wed Apr  5 14:00:19 2023       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.85.05    Driver Version: 525.85.05    CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            Off  | 00000000:00:06.0 Off |                    0 |
+| N/A   36C    P8    12W /  70W |      2MiB / 15360MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+ 14:00:20 up 8 days, 23:10,  3 users,  load average: 0.01, 0.11, 0.26
+Using config: dmc_vision.”
+echo Running task: dmc_walker_walk.”
+2023-04-05 14:00:22.469165: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-04-05 14:00:23.482387: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2023-04-05 14:00:30.802613: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /vol/cuda/11.4.120-cudnn8.2.4/lib64:/vol/cuda/11.4.120-cudnn8.2.4/lib:/usr/lib/x86_64-linux-gnu
+2023-04-05 14:00:30.811334: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /vol/cuda/11.4.120-cudnn8.2.4/lib64:/vol/cuda/11.4.120-cudnn8.2.4/lib:/usr/lib/x86_64-linux-gnu
+2023-04-05 14:00:30.811361: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+
+Config:
+logdir:                    /vol/bitbucket/jk3417/explainable-director/logdir/20230405-140020  (str)
+run:                       train_with_viz                                                     (str)
+seed:                      0                                                                  (int)
+task:                      dmc_walker_walk                                                    (str)
+env.amount:                4                                                                  (int)
+env.parallel:              process                                                            (str)
+env.daemon:                False                                                              (bool)
+env.repeat:                1                                                                  (int)
+env.size:                  [64, 64]                                                           (ints)
+env.camera:                -1                                                                 (int)
+env.gray:                  False                                                              (bool)
+env.length:                0                                                                  (int)
+env.discretize:            0                                                                  (int)
+env.lives:                 False                                                              (bool)
+env.sticky:                True                                                               (bool)
+env.episodic:              True                                                               (bool)
+env.restart:               True                                                               (bool)
+env.again:                 False                                                              (bool)
+env.termination:           False                                                              (bool)
+env.weaker:                1.0                                                                (float)
+env.seed:                  0                                                                  (int)
+replay:                    fixed                                                              (str)
+replay_size:               1000000.0                                                          (float)
+replay_chunk:              64                                                                 (int)
+replay_fixed.prio_starts:  0.0                                                                (float)
+replay_fixed.prio_ends:    1.0                                                                (float)
+replay_fixed.sync:         0                                                                  (int)
+replay_consec.sync:        0                                                                  (int)
+replay_prio.prio_starts:   0.0                                                                (float)
+replay_prio.prio_ends:     1.0                                                                (float)
+replay_prio.sync:          0                                                                  (int)
+replay_prio.fraction:      0.1                                                                (float)
+replay_prio.softmax:       False                                                              (bool)
+replay_prio.temp:          1.0                                                                (float)
+replay_prio.constant:      0.0                                                                (float)
+replay_prio.exponent:      0.5                                                                (float)
+tf.jit:                    True                                                               (bool)
+tf.platform:               gpu                                                                (str)
+tf.precision:              16                                                                 (int)
+tf.debug_nans:             False                                                              (bool)
+tf.logical_gpus:           0                                                                  (int)
+tf.dist_dataset:           False                                                              (bool)
+tf.dist_policy:            False                                                              (bool)
+tf.tensorfloat:            True                                                               (bool)
+tf.placement:              False                                                              (bool)
+tf.growth:                 True                                                               (bool)
+eval_dir:                                                                                     (str)
+filter:                    .*                                                                 (str)
+tbtt:                      0                                                                  (int)
+train.steps:               100000000.0                                                        (float)
+train.expl_until:          0                                                                  (int)
+train.log_every:           10000.0                                                            (float)
+train.eval_every:          30000.0                                                            (float)
+train.eval_eps:            1                                                                  (int)
+train.eval_samples:        1                                                                  (int)
+train.train_every:         16                                                                 (int)
+train.train_steps:         1                                                                  (int)
+train.train_fill:          10000.0                                                            (float)
+train.eval_fill:           10000.0                                                            (float)
+train.pretrain:            1                                                                  (int)
+train.log_zeros:           False                                                              (bool)
+train.log_keys_video:      [image]                                                            (strs)
+train.log_keys_sum:        ^$                                                                 (str)
+train.log_keys_mean:       ^$                                                                 (str)
+train.log_keys_max:        ^$                                                                 (str)
+train.log_timings:         True                                                               (bool)
+train.sync_every:          180                                                                (int)
+task_behavior:             Hierarchy                                                          (str)
+expl_behavior:             None                                                               (str)
+batch_size:                16                                                                 (int)
+transform_rewards:         off                                                                (str)
+expl_noise:                0.0                                                                (float)
+eval_noise:                0.0                                                                (float)
+eval_state_mean:           False                                                              (bool)
+priority:                  reward_loss                                                        (str)
+priority_correct:          0.0                                                                (float)
+data_loader:               tfdata                                                             (str)
+grad_heads:                [decoder, reward, cont]                                            (strs)
+rssm.units:                1024                                                               (int)
+rssm.deter:                1024                                                               (int)
+rssm.stoch:                32                                                                 (int)
+rssm.classes:              32                                                                 (int)
+rssm.act:                  elu                                                                (str)
+rssm.norm:                 layer                                                              (str)
+rssm.initial:              learned2                                                           (str)
+rssm.unroll:               True                                                               (bool)
+encoder.mlp_keys:          $^                                                                 (str)
+encoder.cnn_keys:          image                                                              (str)
+encoder.act:               elu                                                                (str)
+encoder.norm:              layer                                                              (str)
+encoder.mlp_layers:        4                                                                  (int)
+encoder.mlp_units:         512                                                                (int)
+encoder.cnn:               simple                                                             (str)
+encoder.cnn_depth:         64                                                                 (int)
+encoder.cnn_kernels:       [4, 4, 4, 4]                                                       (ints)
+decoder.mlp_keys:          $^                                                                 (str)
+decoder.cnn_keys:          image                                                              (str)
+decoder.act:               elu                                                                (str)
+decoder.norm:              layer                                                              (str)
+decoder.mlp_layers:        4                                                                  (int)
+decoder.mlp_units:         512                                                                (int)
+decoder.cnn:               simple                                                             (str)
+decoder.cnn_depth:         64                                                                 (int)
+decoder.cnn_kernels:       [5, 5, 6, 6]                                                       (ints)
+decoder.image_dist:        mse                                                                (str)
+decoder.inputs:            [deter, stoch]                                                     (strs)
+reward_head.layers:        4                                                                  (int)
+reward_head.units:         512                                                                (int)
+reward_head.act:           elu                                                                (str)
+reward_head.norm:          layer                                                              (str)
+reward_head.dist:          symlog                                                             (str)
+reward_head.outscale:      0.1                                                                (float)
+reward_head.inputs:        [deter, stoch]                                                     (strs)
+cont_head.layers:          4                                                                  (int)
+cont_head.units:           512                                                                (int)
+cont_head.act:             elu                                                                (str)
+cont_head.norm:            layer                                                              (str)
+cont_head.dist:            binary                                                             (str)
+cont_head.outscale:        0.1                                                                (float)
+cont_head.inputs:          [deter, stoch]                                                     (strs)
+loss_scales.kl:            1.0                                                                (float)
+loss_scales.image:         1.0                                                                (float)
+loss_scales.reward:        1.0                                                                (float)
+loss_scales.cont:          1.0                                                                (float)
+model_opt.opt:             adam                                                               (str)
+model_opt.lr:              0.0001                                                             (float)
+model_opt.eps:             1e-06                                                              (float)
+model_opt.clip:            100.0                                                              (float)
+model_opt.wd:              0.01                                                               (float)
+model_opt.wd_pattern:      kernel                                                             (str)
+wmkl.impl:                 mult                                                               (str)
+wmkl.scale:                0.1                                                                (float)
+wmkl.target:               3.5                                                                (float)
+wmkl.min:                  1e-05                                                              (float)
+wmkl.max:                  1.0                                                                (float)
+wmkl.vel:                  0.1                                                                (float)
+wmkl_balance:              0.8                                                                (float)
+actor.layers:              4                                                                  (int)
+actor.units:               512                                                                (int)
+actor.act:                 elu                                                                (str)
+actor.norm:                layer                                                              (str)
+actor.minstd:              0.03                                                               (float)
+actor.maxstd:              1.0                                                                (float)
+actor.outscale:            0.1                                                                (float)
+actor.unimix:              0.01                                                               (float)
+actor.inputs:              [deter, stoch]                                                     (strs)
+critic.layers:             4                                                                  (int)
+critic.units:              512                                                                (int)
+critic.act:                elu                                                                (str)
+critic.norm:               layer                                                              (str)
+critic.dist:               symlog                                                             (str)
+critic.outscale:           0.1                                                                (float)
+critic.inputs:             [deter, stoch]                                                     (strs)
+actor_opt.opt:             adam                                                               (str)
+actor_opt.lr:              0.0001                                                             (float)
+actor_opt.eps:             1e-06                                                              (float)
+actor_opt.clip:            100.0                                                              (float)
+actor_opt.wd:              0.01                                                               (float)
+actor_opt.wd_pattern:      kernel                                                             (str)
+critic_opt.opt:            adam                                                               (str)
+critic_opt.lr:             0.0001                                                             (float)
+critic_opt.eps:            1e-06                                                              (float)
+critic_opt.clip:           100.0                                                              (float)
+critic_opt.wd:             0.01                                                               (float)
+critic_opt.wd_pattern:     kernel                                                             (str)
+actor_dist_disc:           onehot                                                             (str)
+actor_dist_cont:           normal                                                             (str)
+episodic:                  True                                                               (bool)
+discount:                  0.99                                                               (float)
+imag_discount:             0.99                                                               (float)
+imag_horizon:              16                                                                 (int)
+imag_unroll:               True                                                               (bool)
+critic_return:             gve                                                                (str)
+actor_return:              gve                                                                (str)
+return_lambda:             0.95                                                               (float)
+actor_grad_disc:           reinforce                                                          (str)
+actor_grad_cont:           backprop                                                           (str)
+slow_target:               True                                                               (bool)
+slow_target_update:        100                                                                (int)
+slow_target_fraction:      1.0                                                                (float)
+actent.impl:               mult                                                               (str)
+actent.scale:              0.003                                                              (float)
+actent.target:             0.5                                                                (float)
+actent.min:                1e-05                                                              (float)
+actent.max:                100.0                                                              (float)
+actent.vel:                0.1                                                                (float)
+actent_norm:               True                                                               (bool)
+actent_perdim:             True                                                               (bool)
+advnorm.impl:              mean_std                                                           (str)
+advnorm.decay:             0.99                                                               (float)
+advnorm.max:               100000000.0                                                        (float)
+retnorm.impl:              std                                                                (str)
+retnorm.decay:             0.999                                                              (float)
+retnorm.max:               100.0                                                              (float)
+scorenorm.impl:            off                                                                (str)
+scorenorm.decay:           0.99                                                               (float)
+scorenorm.max:             100000000.0                                                        (float)
+adv_slow_critic:           True                                                               (bool)
+pengs_qlambda:             False                                                              (bool)
+critic_type:               vfunction                                                          (str)
+rewnorm_discount:          False                                                              (bool)
+env_skill_duration:        8                                                                  (int)
+train_skill_duration:      8                                                                  (int)
+skill_shape:               [8, 8]                                                             (ints)
+manager_rews.extr:         1.0                                                                (float)
+manager_rews.expl:         0.1                                                                (float)
+manager_rews.goal:         0.0                                                                (float)
+worker_rews.extr:          0.0                                                                (float)
+worker_rews.expl:          0.0                                                                (float)
+worker_rews.goal:          1.0                                                                (float)
+worker_inputs:             [deter, stoch, goal]                                               (strs)
+worker_report_horizon:     64                                                                 (int)
+skill_proposal:            manager                                                            (str)
+goal_proposal:             replay                                                             (str)
+goal_reward:               cosine_max                                                         (str)
+goal_encoder.layers:       4                                                                  (int)
+goal_encoder.units:        512                                                                (int)
+goal_encoder.act:          elu                                                                (str)
+goal_encoder.norm:         layer                                                              (str)
+goal_encoder.dist:         onehot                                                             (str)
+goal_encoder.outscale:     0.1                                                                (float)
+goal_encoder.unimix:       0.0                                                                (float)
+goal_encoder.inputs:       [goal]                                                             (strs)
+goal_decoder.layers:       4                                                                  (int)
+goal_decoder.units:        512                                                                (int)
+goal_decoder.act:          elu                                                                (str)
+goal_decoder.norm:         layer                                                              (str)
+goal_decoder.dist:         mse                                                                (str)
+goal_decoder.outscale:     0.1                                                                (float)
+goal_decoder.inputs:       [skill]                                                            (strs)
+worker_goals:              [manager]                                                          (strs)
+jointly:                   new                                                                (str)
+vae_imag:                  False                                                              (bool)
+vae_replay:                True                                                               (bool)
+vae_span:                  False                                                              (bool)
+encdec_kl.impl:            mult                                                               (str)
+encdec_kl.scale:           0.0                                                                (float)
+encdec_kl.target:          10.0                                                               (float)
+encdec_kl.min:             1e-05                                                              (float)
+encdec_kl.max:             1.0                                                                (float)
+encdec_opt.opt:            adam                                                               (str)
+encdec_opt.lr:             0.0001                                                             (float)
+encdec_opt.eps:            1e-06                                                              (float)
+encdec_opt.clip:           100.0                                                              (float)
+encdec_opt.wd:             0.01                                                               (float)
+encdec_opt.wd_pattern:     kernel                                                             (str)
+explorer:                  False                                                              (bool)
+explorer_repeat:           False                                                              (bool)
+expl_rew:                  adver                                                              (str)
+manager_dist:              onehot                                                             (str)
+manager_grad:              reinforce                                                          (str)
+manager_actent:            0.5                                                                (float)
+adver_impl:                squared                                                            (str)
+manager_delta:             False                                                              (bool)
+goal_kl:                   True                                                               (bool)
+expl_rewards.extr:         0.0                                                                (float)
+expl_rewards.disag:        0.0                                                                (float)
+expl_rewards.vae:          0.0                                                                (float)
+expl_rewards.ctrl:         0.0                                                                (float)
+expl_rewards.pbe:          0.0                                                                (float)
+expl_discount:             0.99                                                               (float)
+expl_retnorm.impl:         std                                                                (str)
+expl_retnorm.decay:        0.999                                                              (float)
+expl_retnorm.max:          100000000.0                                                        (float)
+expl_scorenorm.impl:       off                                                                (str)
+expl_scorenorm.decay:      0.999                                                              (float)
+expl_scorenorm.max:        100000000.0                                                        (float)
+disag_head.layers:         4                                                                  (int)
+disag_head.units:          512                                                                (int)
+disag_head.act:            elu                                                                (str)
+disag_head.norm:           layer                                                              (str)
+disag_head.dist:           mse                                                                (str)
+disag_head.inputs:         [deter, stoch, action]                                             (strs)
+expl_opt.opt:              adam                                                               (str)
+expl_opt.lr:               0.0001                                                             (float)
+expl_opt.eps:              1e-06                                                              (float)
+expl_opt.clip:             100.0                                                              (float)
+expl_opt.wd:               0.01                                                               (float)
+disag_target:              [stoch]                                                            (strs)
+disag_models:              8                                                                  (int)
+ctrl_embed.layers:         3                                                                  (int)
+ctrl_embed.units:          512                                                                (int)
+ctrl_embed.act:            elu                                                                (str)
+ctrl_embed.norm:           layer                                                              (str)
+ctrl_embed.dist:           mse                                                                (str)
+ctrl_embed.inputs:         [deter, stoch]                                                     (strs)
+ctrl_head.layers:          1                                                                  (int)
+ctrl_head.units:           128                                                                (int)
+ctrl_head.act:             elu                                                                (str)
+ctrl_head.norm:            layer                                                              (str)
+ctrl_head.dist:            mse                                                                (str)
+ctrl_head.inputs:          [current, next]                                                    (strs)
+ctrl_size:                 32                                                                 (int)
+ctrl_opt.opt:              adam                                                               (str)
+ctrl_opt.lr:               0.0001                                                             (float)
+ctrl_opt.eps:              1e-06                                                              (float)
+ctrl_opt.clip:             100.0                                                              (float)
+ctrl_opt.wd:               0.01                                                               (float)
+expl_enc.layers:           4                                                                  (int)
+expl_enc.units:            512                                                                (int)
+expl_enc.act:              elu                                                                (str)
+expl_enc.norm:             layer                                                              (str)
+expl_enc.dist:             onehot                                                             (str)
+expl_enc.outscale:         0.1                                                                (float)
+expl_enc.inputs:           [deter]                                                            (strs)
+expl_enc.shape:            [8, 8]                                                             (ints)
+expl_dec.layers:           4                                                                  (int)
+expl_dec.units:            512                                                                (int)
+expl_dec.act:              elu                                                                (str)
+expl_dec.norm:             layer                                                              (str)
+expl_dec.dist:             mse                                                                (str)
+expl_dec.outscale:         0.1                                                                (float)
+expl_kl.impl:              mult                                                               (str)
+expl_kl.scale:             0.1                                                                (float)
+expl_kl.target:            10.0                                                               (float)
+expl_kl.min:               0.01                                                               (float)
+expl_kl.max:               1.0                                                                (float)
+expl_kl.vel:               0.1                                                                (float)
+expl_vae_elbo:             False                                                              (bool)
+2023-04-05 14:01:01.999566: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:02.267783: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:02.271185: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:02.274231: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:02.292978: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-04-05 14:01:02.293503: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:02.296407: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:02.299065: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:03.970015: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:03.973488: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:03.975200: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:980] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-04-05 14:01:03.976826: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13631 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:06.0, compute capability: 7.5
+Encoder CNN shapes: {'image': (64, 64, 3)}
+Encoder MLP shapes: {}
+Decoder CNN shapes: {'image': (64, 64, 3)}
+Decoder MLP shapes: {}
+Synced last 0/0 trajectories.
+Synced last 0/0 trajectories.
+Synced last 0/0 trajectories.
+Synced last 0/0 trajectories.
+Logdir /vol/bitbucket/jk3417/explainable-director/logdir/20230405-140020
+Fill eval dataset (10000.0 steps).
+Saved episode: 20230405T130109-58b5b4078c9745238c2ba3101f35297d-len1001-rew28.npz
+Saved episode: 20230405T130109-174aa0d69a6e47b5a53a9b4409aac29d-len1001-rew31.npz
+Saved episode: 20230405T130109-716b520907304f96a67e758725bf89b4-len1001-rew29.npz
+Saved episode: 20230405T130109-8eadc5d04be54252ae714f18e5f23516-len1001-rew30.npz
+Saved episode: 20230405T130115-b19a33fb3db545d990b489b7a9f7c802-len1001-rew31.npz
+Saved episode: 20230405T130115-838449114f5b4b01b556e6c20c5e8d34-len1001-rew32.npz
+Saved episode: 20230405T130115-e5abc61126dd44d084b9e941252560bd-len1001-rew39.npz
+Saved episode: 20230405T130115-ea3e7ade12e642fa89ee1a22949ac9a0-len1001-rew40.npz
+Fill train dataset (10000.0 steps).
+Episode has 1000 steps and return 39.8.
+────────────────────────────────── Step 4004 ───────────────────────────────────
+episode/length 1000 / episode/score 39.83 / episode/reward_rate 0.08 / 
+replay/replay_steps 4004 / replay/replay_trajs 4
+
+Episode has 1000 steps and return 32.2.
+────────────────────────────────── Step 4004 ───────────────────────────────────
+episode/length 1000 / episode/score 32.22 / episode/reward_rate 0.02 / 
+replay/replay_steps 4004 / replay/replay_trajs 4
+
+Saved episode: 20230405T130123-6922f5f2cddc494fb5c427baa4a21e22-len1001-rew39.npz
+Saved episode: 20230405T130123-6d07be74c6b74092952a643ae3d0b9aa-len1001-rew32.npz
+Saved episode: 20230405T130123-6e8a7fd9254347feb4d81c6db9a27a44-len1001-rew31.npz
+Saved episode: 20230405T130124-20132db6415e4391a64218bbecc13cd8-len1001-rew32.npz
+Episode has 1000 steps and return 31.6.
+────────────────────────────────── Step 4004 ───────────────────────────────────
+episode/length 1000 / episode/score 31.6 / episode/reward_rate 0.03 / 
+replay/replay_steps 4004 / replay/replay_trajs 4
+
+Episode has 1000 steps and return 32.5.
+────────────────────────────────── Step 4004 ───────────────────────────────────
+episode/length 1000 / episode/score 32.47 / episode/reward_rate 0.03 / 
+replay/replay_steps 4004 / replay/replay_trajs 4
+
+Episode has 1000 steps and return 30.9.
+────────────────────────────────── Step 8008 ───────────────────────────────────
+episode/length 1000 / episode/score 30.89 / episode/reward_rate 0.02 / 
+replay/replay_steps 8008 / replay/replay_trajs 8
+
+Episode has 1000 steps and return 30.8.
+────────────────────────────────── Step 8008 ───────────────────────────────────
+episode/length 1000 / episode/score 30.81 / episode/reward_rate 0.01 / 
+replay/replay_steps 8008 / replay/replay_trajs 8
+
+Episode has 1000 steps and return 41.3.
+────────────────────────────────── Step 8008 ───────────────────────────────────
+episode/length 1000 / episode/score 41.31 / episode/reward_rate 0.08 / 
+replay/replay_steps 8008 / replay/replay_trajs 8
+
+Episode has 1000 steps and return 35.4.
+────────────────────────────────── Step 8008 ───────────────────────────────────
+episode/length 1000 / episode/score 35.39 / episode/reward_rate 0.05 / 
+replay/replay_steps 8008 / replay/replay_trajs 8
+2023-04-05 14:04:56.120545: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8204
+error: Can't find libdevice directory ${CUDA_DIR}/nvvm/libdevice
+error: Can't find libdevice directory ${CUDA_DIR}/nvvm/libdevice
+error: Can't find libdevice directory ${CUDA_DIR}/nvvm/libdevice
+error: Can't find libdevice directory ${CUDA_DIR}/nvvm/libdevice
+2023-04-05 14:05:24.771961: W tensorflow/core/framework/op_kernel.cc:1768] UNKNOWN: JIT compilation failed.
+
+Saved episode: 20230405T130131-7ea73417f12841aebe96e3fefc2555c5-len1001-rew30.npz
+Saved episode: 20230405T130131-00b81ccfc3a64c0ab67ba79cfcb10011-len1001-rew30.npz
+Saved episode: 20230405T130131-b7a5f50309b44d9180b69cc80acdffff-len1001-rew41.npz
+Saved episode: 20230405T130131-c47093e5e0c341d2abbeb5fa2e9d0e75-len1001-rew35.npz
+Tracing train function.
+Found 34318853 model parameters.
+Optimizer applied weight decay to model variables:
+[x] conv2d/kernel:0
+[x] conv2d_1/kernel:0
+[x] conv2d_2/kernel:0
+[x] conv2d_3/kernel:0
+[x] conv2d_transpose/kernel:0
+[x] conv2d_transpose_1/kernel:0
+[x] conv2d_transpose_2/kernel:0
+[x] conv2d_transpose_3/kernel:0
+[x] dense/kernel:0
+[x] dense/kernel:0
+[x] dense_1/kernel:0
+[x] dense_1/kernel:0
+[x] dense_10/kernel:0
+[x] dense_11/kernel:0
+[x] dense_12/kernel:0
+[x] dense_13/kernel:0
+[x] dense_2/kernel:0
+[x] dense_3/kernel:0
+[x] dense_4/kernel:0
+[x] dense_5/kernel:0
+[x] dense_6/kernel:0
+[x] dense_7/kernel:0
+[x] dense_8/kernel:0
+[x] dense_9/kernel:0
+[ ] Variable:0
+[ ] conv2d_transpose_3/bias:0
+[ ] dense_1/bias:0
+[ ] dense_13/bias:0
+[ ] dense_3/bias:0
+[ ] dense_8/bias:0
+[ ] norm/offset:0
+[ ] norm/offset:0
+[ ] norm/scale:0
+[ ] norm/scale:0
+[ ] norm_1/offset:0
+[ ] norm_1/scale:0
+[ ] norm_10/offset:0
+[ ] norm_10/scale:0
+[ ] norm_12/offset:0
+[ ] norm_12/scale:0
+[ ] norm_13/offset:0
+[ ] norm_13/scale:0
+[ ] norm_14/offset:0
+[ ] norm_14/scale:0
+[ ] norm_15/offset:0
+[ ] norm_15/scale:0
+[ ] norm_16/offset:0
+[ ] norm_16/scale:0
+[ ] norm_17/offset:0
+[ ] norm_17/scale:0
+[ ] norm_18/offset:0
+[ ] norm_18/scale:0
+[ ] norm_19/offset:0
+[ ] norm_19/scale:0
+[ ] norm_2/offset:0
+[ ] norm_2/scale:0
+[ ] norm_3/offset:0
+[ ] norm_3/scale:0
+[ ] norm_4/offset:0
+[ ] norm_4/scale:0
+[ ] norm_5/offset:0
+[ ] norm_5/scale:0
+[ ] norm_6/offset:0
+[ ] norm_6/scale:0
+[ ] norm_8/offset:0
+[ ] norm_8/scale:0
+[ ] norm_9/offset:0
+[ ] norm_9/scale:0
+
+Found 2696256 goal parameters.
+Optimizer applied weight decay to goal variables:
+[x] dense_14/kernel:0
+[x] dense_15/kernel:0
+[x] dense_16/kernel:0
+[x] dense_17/kernel:0
+[x] dense_18/kernel:0
+[x] dense_19/kernel:0
+[x] dense_20/kernel:0
+[x] dense_21/kernel:0
+[x] dense_22/kernel:0
+[x] dense_23/kernel:0
+[ ] dense_18/bias:0
+[ ] dense_23/bias:0
+[ ] norm_20/offset:0
+[ ] norm_20/scale:0
+[ ] norm_21/offset:0
+[ ] norm_21/scale:0
+[ ] norm_22/offset:0
+[ ] norm_22/scale:0
+[ ] norm_23/offset:0
+[ ] norm_23/scale:0
+[ ] norm_24/offset:0
+[ ] norm_24/scale:0
+[ ] norm_25/offset:0
+[ ] norm_25/scale:0
+[ ] norm_26/offset:0
+[ ] norm_26/scale:0
+[ ] norm_27/offset:0
+[ ] norm_27/scale:0
+
+Found 2363905 critic parameters.
+Optimizer applied weight decay to critic variables:
+[x] dense_40/kernel:0
+[x] dense_41/kernel:0
+[x] dense_42/kernel:0
+[x] dense_43/kernel:0
+[x] dense_44/kernel:0
+[ ] dense_44/bias:0
+[ ] norm_40/offset:0
+[ ] norm_40/scale:0
+[ ] norm_41/offset:0
+[ ] norm_41/scale:0
+[ ] norm_42/offset:0
+[ ] norm_42/scale:0
+[ ] norm_43/offset:0
+[ ] norm_43/scale:0
+
+Found 2369548 actor parameters.
+Optimizer applied weight decay to actor variables:
+[x] dense_29/kernel:0
+[x] dense_30/kernel:0
+[x] dense_31/kernel:0
+[x] dense_32/kernel:0
+[x] dense_33/kernel:0
+[x] dense_34/kernel:0
+[ ] dense_33/bias:0
+[ ] dense_34/bias:0
+[ ] norm_32/offset:0
+[ ] norm_32/scale:0
+[ ] norm_33/offset:0
+[ ] norm_33/scale:0
+[ ] norm_34/offset:0
+[ ] norm_34/scale:0
+[ ] norm_35/offset:0
+[ ] norm_35/scale:0
+
+Found 1839617 critic parameters.
+Optimizer applied weight decay to critic variables:
+[x] dense_50/kernel:0
+[x] dense_51/kernel:0
+[x] dense_52/kernel:0
+[x] dense_53/kernel:0
+[x] dense_54/kernel:0
+[ ] dense_54/bias:0
+[ ] norm_48/offset:0
+[ ] norm_48/scale:0
+[ ] norm_49/offset:0
+[ ] norm_49/scale:0
+[ ] norm_50/offset:0
+[ ] norm_50/scale:0
+[ ] norm_51/offset:0
+[ ] norm_51/scale:0
+
+Found 1839617 critic parameters.
+Optimizer applied weight decay to critic variables:
+[x] dense_60/kernel:0
+[x] dense_61/kernel:0
+[x] dense_62/kernel:0
+[x] dense_63/kernel:0
+[x] dense_64/kernel:0
+[ ] dense_64/bias:0
+[ ] norm_56/offset:0
+[ ] norm_56/scale:0
+[ ] norm_57/offset:0
+[ ] norm_57/scale:0
+[ ] norm_58/offset:0
+[ ] norm_58/scale:0
+[ ] norm_59/offset:0
+[ ] norm_59/scale:0
+
+Found 1871936 actor parameters.
+Optimizer applied weight decay to actor variables:
+[x] dense_24/kernel:0
+[x] dense_25/kernel:0
+[x] dense_26/kernel:0
+[x] dense_27/kernel:0
+[x] dense_28/kernel:0
+[ ] dense_28/bias:0
+[ ] norm_28/offset:0
+[ ] norm_28/scale:0
+[ ] norm_29/offset:0
+[ ] norm_29/scale:0
+[ ] norm_30/offset:0
+[ ] norm_30/scale:0
+[ ] norm_31/offset:0
+[ ] norm_31/scale:0
+
+Tracing train function.
+Existing checkpoint not found.
+Saving checkpoint: /vol/bitbucket/jk3417/explainable-director/logdir/20230405-140020/checkpoint.pkl
+Saving module with 238 tensors and 53342911 parameters.
+Start training loop.
+Tracing policy function.
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py:12 │
+│ 4 in <module>                                                                │
+│                                                                              │
+│   121                                                                        │
+│   122                                                                        │
+│   123 if __name__ == '__main__':                                             │
+│ ❱ 124   main()                                                               │
+│   125                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py:10 │
+│ 3 in main                                                                    │
+│                                                                              │
+│   100 │   │   assert config.train.eval_fill                                  │
+│   101 │   │   eval_replay = make_replay('eval_episodes', config.replay_size  │
+│   102 │     replay = make_replay('episodes', config.replay_size)             │
+│ ❱ 103 │     train_with_viz.train_with_viz(                                   │
+│   104 │   │     agent, env, replay, eval_replay, logger, args)               │
+│   105 │   elif config.run == 'learning':                                     │
+│   106 │     assert config.replay.sync                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_ │
+│ viz.py:128 in train_with_viz                                                 │
+│                                                                              │
+│   125 │   # for name, values in scalars.items():                             │
+│   126 │   #   logger.scalar(f'eval/{name}', np.array(values, np.float64).mea │
+│   127 │   logger.write()                                                     │
+│ ❱ 128 │   driver(policy, steps=args.eval_every)                              │
+│   129 │   checkpoint.save()                                                  │
+│   130                                                                        │
+│   131                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py:42 in        │
+│ __call__                                                                     │
+│                                                                              │
+│   39   def __call__(self, policy, steps=0, episodes=0):                      │
+│   40 │   step, episode = 0, 0                                                │
+│   41 │   while step < steps or episode < episodes:                           │
+│ ❱ 42 │     step, episode = self._step(policy, step, episode)                 │
+│   43                                                                         │
+│   44   def _step(self, policy, step, episode):                               │
+│   45 │   acts, self._state = policy(self._obs, self._state, **self._kwargs)  │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py:45 in _step  │
+│                                                                              │
+│   42 │     step, episode = self._step(policy, step, episode)                 │
+│   43                                                                         │
+│   44   def _step(self, policy, step, episode):                               │
+│ ❱ 45 │   acts, self._state = policy(self._obs, self._state, **self._kwargs)  │
+│   46 │   acts['reset'] = np.zeros(len(self._env), bool)                      │
+│   47 │   if self._obs['is_last'].any():                                      │
+│   48 │     acts = {                                                          │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_ │
+│ viz.py:117 in <lambda>                                                       │
+│                                                                              │
+│   114   checkpoint.load_or_save()                                            │
+│   115                                                                        │
+│   116   print('Start training loop.')                                        │
+│ ❱ 117   policy = lambda *args: agent.policy(                                 │
+│   118 │     *args, mode='explore' if should_expl(step) else 'train')         │
+│   119   while step < args.steps:                                             │
+│   120 │   # scalars = collections.defaultdict(list)                          │
+│                                                                              │
+│ /usr/lib/python3.10/contextlib.py:79 in inner                                │
+│                                                                              │
+│    76 │   │   @wraps(func)                                                   │
+│    77 │   │   def inner(*args, **kwds):                                      │
+│    78 │   │   │   with self._recreate_cm():                                  │
+│ ❱  79 │   │   │   │   return func(*args, **kwds)                             │
+│    80 │   │   return inner                                                   │
+│    81                                                                        │
+│    82                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfagent.py: │
+│ 43 in policy                                                                 │
+│                                                                              │
+│    40 │     if key not in self._cached_fns:                                  │
+│    41 │   │   self._cached_fns[key] = fn.get_concrete_function(obs, state, m │
+│    42 │     fn = self._cached_fns[key]                                       │
+│ ❱  43 │   act, state = fn(obs, state, mode)                                  │
+│    44 │   act = self._convert_outs(act)                                      │
+│    45 │   return act, state                                                  │
+│    46                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1604 in __call__                                           │
+│                                                                              │
+│   1601 │   │   `get_concrete_function`.                                      │
+│   1602 │     TypeError: If the arguments do not match the function's signatu │
+│   1603 │   """                                                               │
+│ ❱ 1604 │   return self._call_impl(args, kwargs)                              │
+│   1605                                                                       │
+│   1606   def _call_impl(self, args, kwargs, cancellation_manager=None):      │
+│   1607 │   """See `__call__` for details."""                                 │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1613 in _call_impl                                         │
+│                                                                              │
+│   1610 │     # applies first; and if not, then use the flat signature.       │
+│   1611 │     if self._function_spec is not None:                             │
+│   1612 │   │   try:                                                          │
+│ ❱ 1613 │   │     return self._call_with_structured_signature(args, kwargs,   │
+│   1614 │   │   │   │   │   │   │   │   │   │   │   │   │     cancellation_ma │
+│   1615 │   │   except TypeError as structured_err:                           │
+│   1616 │   │     try:                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1694 in _call_with_structured_signature                    │
+│                                                                              │
+│   1691 │   self._structured_signature_check_missing_args(args, kwargs)       │
+│   1692 │   self._structured_signature_check_unexpected_args(args, kwargs)    │
+│   1693 │   self._structured_signature_check_arg_types(args, kwargs)          │
+│ ❱ 1694 │   return self._call_flat(                                           │
+│   1695 │   │   filtered_flat_args,                                           │
+│   1696 │   │   captured_inputs=self.captured_inputs,                         │
+│   1697 │   │   cancellation_manager=cancellation_manager)                    │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1862 in _call_flat                                         │
+│                                                                              │
+│   1859 │   if (possible_gradient_type == gradients_util.POSSIBLE_GRADIENT_TY │
+│   1860 │   │   and executing_eagerly):                                       │
+│   1861 │     # No tape is watching; skip to running the function.            │
+│ ❱ 1862 │     return self._build_call_outputs(self._inference_function.call(  │
+│   1863 │   │     ctx, args, cancellation_manager=cancellation_manager))      │
+│   1864 │   forward_backward = self._select_forward_and_backward_functions(   │
+│   1865 │   │   args,                                                         │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:499 in call                                                │
+│                                                                              │
+│    496 │   if executing_eagerly:                                             │
+│    497 │     with _InterpolateFunctionError(self):                           │
+│    498 │   │   if cancellation_manager is None:                              │
+│ ❱  499 │   │     outputs = execute.execute(                                  │
+│    500 │   │   │     str(self.signature.name),                               │
+│    501 │   │   │     num_outputs=self._num_outputs,                          │
+│    502 │   │   │     inputs=args,                                            │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/execute.py:54 in quick_execute                                         │
+│                                                                              │
+│    51   # pylint: disable=protected-access                                   │
+│    52   try:                                                                 │
+│    53 │   ctx.ensure_initialized()                                           │
+│ ❱  54 │   tensors = pywrap_tfe.TFE_Py_Execute(ctx._handle, device_name, op_n │
+│    55 │   │   │   │   │   │   │   │   │   │   inputs, attrs, num_outputs)    │
+│    56   except core._NotOkStatusException as e:                              │
+│    57 │   if name is not None:                                               │
+╰──────────────────────────────────────────────────────────────────────────────╯
+UnknownError: Graph execution error:
+
+Detected at node 'mod' defined at (most recent call last):
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py", 
+line 124, in <module>
+      main()
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py", 
+line 103, in main
+      train_with_viz.train_with_viz(
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_viz
+.py", line 128, in train_with_viz
+      driver(policy, steps=args.eval_every)
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+42, in __call__
+      step, episode = self._step(policy, step, episode)
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+45, in _step
+      acts, self._state = policy(self._obs, self._state, **self._kwargs)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_viz
+.py", line 117, in <lambda>
+      policy = lambda *args: agent.policy(
+    File "/usr/lib/python3.10/contextlib.py", line 79, in inner
+      return func(*args, **kwds)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfagent.py", 
+line 41, in policy
+      self._cached_fns[key] = fn.get_concrete_function(obs, state, mode)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 51, in policy
+      if mode == 'eval':
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 55, in policy
+      elif mode == 'explore':
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 56, in policy
+      outs, expl_state = self.expl_behavior.policy(latent, expl_state)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 83, in policy
+      update = (carry['step'] % duration) == 0
+Node: 'mod'
+JIT compilation failed.
+         [[{{node mod}}]] [Op:__inference_policy_170112]
+2023-04-05 14:05:55.905592: W tensorflow/core/kernels/data/generator_dataset_op.cc:108] Error occurred when finalizing GeneratorDataset iterator: FAILED_PRECONDITION: Python interpreter state is not initialized. The process may be terminated.
+	 [[{{node PyFunc}}]]
+2023-04-05 14:05:55.905779: W tensorflow/core/kernels/data/generator_dataset_op.cc:108] Error occurred when finalizing GeneratorDataset iterator: FAILED_PRECONDITION: Python interpreter state is not initialized. The process may be terminated.
+	 [[{{node PyFunc}}]]
+2023-04-05 14:05:55.905878: W tensorflow/core/kernels/data/generator_dataset_op.cc:108] Error occurred when finalizing GeneratorDataset iterator: FAILED_PRECONDITION: Python interpreter state is not initialized. The process may be terminated.
+	 [[{{node PyFunc}}]]
+2023-04-05 14:05:55.906022: W tensorflow/core/kernels/data/generator_dataset_op.cc:108] Error occurred when finalizing GeneratorDataset iterator: FAILED_PRECONDITION: Python interpreter state is not initialized. The process may be terminated.
+	 [[{{node PyFunc}}]]
+srun: error: cloud-vm-40-226: task 0: Exited with exit code 1
