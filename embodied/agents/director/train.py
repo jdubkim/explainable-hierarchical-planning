@@ -8,17 +8,6 @@ warnings.filterwarnings('ignore', '.*box bound precision lowered.*')
 warnings.filterwarnings('ignore', '.*using stateful random seeds*')
 warnings.filterwarnings('ignore', '.*is a deprecated alias for.*')
 
-# Check if gpu is available.
-
-physical_devices = tf.config.list_physical_devices('GPU')
-print("CUDA GPU available") if physical_devices else print("CUDA GPU not available.")
-
-try:
-  tf.config.experimental.set_memory_growth(physical_devices[0], True)
-  print("Successfully set memory growth.")
-except:
-  print("Failed to set memory growth.")
-
 directory = pathlib.Path(__file__)
 try:
   import google3  # noqa
