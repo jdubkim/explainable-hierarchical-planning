@@ -5,7 +5,7 @@ import warnings
 import embodied
 import numpy as np
 
-
+# Train an agent with visualization.
 def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
 
   logdir = embodied.Path(args.logdir)
@@ -43,6 +43,7 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
         logs[f'mean_{key}'] = ep[key].mean()
       if re.match(args.log_keys_max, key):
         logs[f'max_{key}'] = ep[key].max(0).mean()
+    # Record and add the video to the metrics every evaluation step.
     if should_video(step):
       for key in args.log_keys_video:
         if key == 'none':

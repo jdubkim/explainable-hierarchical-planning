@@ -25,19 +25,23 @@ def main(argv=None):
   from . import agent as agnt
   from . import train_with_viz
 
+  # Parse command line arguments.
   parsed, other = embodied.Flags(
       configs=['defaults'], actor_id=0, actors=0,
   ).parse_known(argv)
+  # Load configuration.
   config = embodied.Config(agnt.Agent.configs['defaults'])
   for name in parsed.configs:
     config = config.update(agnt.Agent.configs[name])
   config = embodied.Flags(config).parse(other)
 
+  # Update configuration.
   config = config.update(logdir=str(embodied.Path(config.logdir)))
   args = embodied.Config(logdir=config.logdir, **config.train)
   args = args.update(expl_until=args.expl_until // config.env.repeat)
   print(config)
 
+  # Create log directory.
   logdir = embodied.Path(config.logdir)
   step = embodied.Counter()
   cleanup = []
@@ -83,6 +87,7 @@ def main(argv=None):
     env = embodied.envs.load_env(
         config.task, mode='train', logdir=logdir, **config.env)
     agent = agnt.Agent(env.obs_space, env.act_space, step, config)
+    print(f"Run Type: {config.run}")
     if config.run == 'train':
       replay = make_replay('episodes', config.replay_size)
       embodied.run.train(agent, env, replay, logger, args)

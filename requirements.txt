@@ -4,6 +4,7 @@ crafter
 dm-sonnet
 dm_control
 gym==0.19.0
+gym-minigrid==1.0.3
 numpy
 opencv-python
 rich
