@@ -177,6 +177,20 @@ dmc_proprio:
   decoder: {mlp_keys: '.*', cnn_keys: '$^'}
   env.repeat: 1
 
+minigrid_vision:
+
+  task: minigrid_door_key_vision
+  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
+  env.repeat: 1
+
+minigrid_flat:
+
+  task: minigrid_door_key_flat
+  encoder: {mlp_keys: '.*', cnn_keys: '$^'}
+  decoder: {mlp_keys: '.*', cnn_keys: '$^'}
+  env.repeat: 1
+
 pinpad:
 
   task: pinpad_five
