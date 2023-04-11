@@ -331,4 +331,4 @@ class FlatObsWrapper(base.Wrapper):
     def step(self, action):
         obs = self.env.step(action)
         obs[self._key] = obs[self._key].reshape(self._shape)
-        return obs
+        return obs[self._key]
