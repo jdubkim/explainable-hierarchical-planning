@@ -2,8 +2,6 @@ import pathlib
 import sys
 import warnings
 
-import tensorflow as tf
-
 warnings.filterwarnings('ignore', '.*box bound precision lowered.*')
 warnings.filterwarnings('ignore', '.*using stateful random seeds*')
 warnings.filterwarnings('ignore', '.*is a deprecated alias for.*')

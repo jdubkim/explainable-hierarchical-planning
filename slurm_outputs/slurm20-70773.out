@@ -404,3 +404,611 @@ Episode has 1000 steps and return 35.7.
 ────────────────────────────────── Step 8008 ───────────────────────────────────
 episode/length 1000 / episode/score 35.71 / episode/reward_rate 0.04 / 
 replay/replay_steps 8008 / replay/replay_trajs 8
+
+Saved episode: 20230405T133533-4e37a377c73d4afea8bc8388d3704e22-len1001-rew33.npz
+Saved episode: 20230405T133533-ece8e5cf81904aa39805d1e1662479ea-len1001-rew30.npz
+Saved episode: 20230405T133533-83d8af46478b4c6291ef7acaf2aaab5d-len1001-rew31.npz
+Saved episode: 20230405T133533-c6993968a6ad454a8c4cf91d1161ce87-len1001-rew35.npz
+Tracing train function.
+Found 34318853 model parameters.
+Optimizer applied weight decay to model variables:
+[x] conv2d/kernel:0
+[x] conv2d_1/kernel:0
+[x] conv2d_2/kernel:0
+[x] conv2d_3/kernel:0
+[x] conv2d_transpose/kernel:0
+[x] conv2d_transpose_1/kernel:0
+[x] conv2d_transpose_2/kernel:0
+[x] conv2d_transpose_3/kernel:0
+[x] dense/kernel:0
+[x] dense/kernel:0
+[x] dense_1/kernel:0
+[x] dense_1/kernel:0
+[x] dense_10/kernel:0
+[x] dense_11/kernel:0
+[x] dense_12/kernel:0
+[x] dense_13/kernel:0
+[x] dense_2/kernel:0
+[x] dense_3/kernel:0
+[x] dense_4/kernel:0
+[x] dense_5/kernel:0
+[x] dense_6/kernel:0
+[x] dense_7/kernel:0
+[x] dense_8/kernel:0
+[x] dense_9/kernel:0
+[ ] Variable:0
+[ ] conv2d_transpose_3/bias:0
+[ ] dense_1/bias:0
+[ ] dense_13/bias:0
+[ ] dense_3/bias:0
+[ ] dense_8/bias:0
+[ ] norm/offset:0
+[ ] norm/offset:0
+[ ] norm/scale:0
+[ ] norm/scale:0
+[ ] norm_1/offset:0
+[ ] norm_1/scale:0
+[ ] norm_10/offset:0
+[ ] norm_10/scale:0
+[ ] norm_12/offset:0
+[ ] norm_12/scale:0
+[ ] norm_13/offset:0
+[ ] norm_13/scale:0
+[ ] norm_14/offset:0
+[ ] norm_14/scale:0
+[ ] norm_15/offset:0
+[ ] norm_15/scale:0
+[ ] norm_16/offset:0
+[ ] norm_16/scale:0
+[ ] norm_17/offset:0
+[ ] norm_17/scale:0
+[ ] norm_18/offset:0
+[ ] norm_18/scale:0
+[ ] norm_19/offset:0
+[ ] norm_19/scale:0
+[ ] norm_2/offset:0
+[ ] norm_2/scale:0
+[ ] norm_3/offset:0
+[ ] norm_3/scale:0
+[ ] norm_4/offset:0
+[ ] norm_4/scale:0
+[ ] norm_5/offset:0
+[ ] norm_5/scale:0
+[ ] norm_6/offset:0
+[ ] norm_6/scale:0
+[ ] norm_8/offset:0
+[ ] norm_8/scale:0
+[ ] norm_9/offset:0
+[ ] norm_9/scale:0
+
+Found 2696256 goal parameters.
+Optimizer applied weight decay to goal variables:
+[x] dense_14/kernel:0
+[x] dense_15/kernel:0
+[x] dense_16/kernel:0
+[x] dense_17/kernel:0
+[x] dense_18/kernel:0
+[x] dense_19/kernel:0
+[x] dense_20/kernel:0
+[x] dense_21/kernel:0
+[x] dense_22/kernel:0
+[x] dense_23/kernel:0
+[ ] dense_18/bias:0
+[ ] dense_23/bias:0
+[ ] norm_20/offset:0
+[ ] norm_20/scale:0
+[ ] norm_21/offset:0
+[ ] norm_21/scale:0
+[ ] norm_22/offset:0
+[ ] norm_22/scale:0
+[ ] norm_23/offset:0
+[ ] norm_23/scale:0
+[ ] norm_24/offset:0
+[ ] norm_24/scale:0
+[ ] norm_25/offset:0
+[ ] norm_25/scale:0
+[ ] norm_26/offset:0
+[ ] norm_26/scale:0
+[ ] norm_27/offset:0
+[ ] norm_27/scale:0
+
+Found 2363905 critic parameters.
+Optimizer applied weight decay to critic variables:
+[x] dense_40/kernel:0
+[x] dense_41/kernel:0
+[x] dense_42/kernel:0
+[x] dense_43/kernel:0
+[x] dense_44/kernel:0
+[ ] dense_44/bias:0
+[ ] norm_40/offset:0
+[ ] norm_40/scale:0
+[ ] norm_41/offset:0
+[ ] norm_41/scale:0
+[ ] norm_42/offset:0
+[ ] norm_42/scale:0
+[ ] norm_43/offset:0
+[ ] norm_43/scale:0
+
+Found 2369548 actor parameters.
+Optimizer applied weight decay to actor variables:
+[x] dense_29/kernel:0
+[x] dense_30/kernel:0
+[x] dense_31/kernel:0
+[x] dense_32/kernel:0
+[x] dense_33/kernel:0
+[x] dense_34/kernel:0
+[ ] dense_33/bias:0
+[ ] dense_34/bias:0
+[ ] norm_32/offset:0
+[ ] norm_32/scale:0
+[ ] norm_33/offset:0
+[ ] norm_33/scale:0
+[ ] norm_34/offset:0
+[ ] norm_34/scale:0
+[ ] norm_35/offset:0
+[ ] norm_35/scale:0
+
+Found 1839617 critic parameters.
+Optimizer applied weight decay to critic variables:
+[x] dense_50/kernel:0
+[x] dense_51/kernel:0
+[x] dense_52/kernel:0
+[x] dense_53/kernel:0
+[x] dense_54/kernel:0
+[ ] dense_54/bias:0
+[ ] norm_48/offset:0
+[ ] norm_48/scale:0
+[ ] norm_49/offset:0
+[ ] norm_49/scale:0
+[ ] norm_50/offset:0
+[ ] norm_50/scale:0
+[ ] norm_51/offset:0
+[ ] norm_51/scale:0
+
+Found 1839617 critic parameters.
+Optimizer applied weight decay to critic variables:
+[x] dense_60/kernel:0
+[x] dense_61/kernel:0
+[x] dense_62/kernel:0
+[x] dense_63/kernel:0
+[x] dense_64/kernel:0
+[ ] dense_64/bias:0
+[ ] norm_56/offset:0
+[ ] norm_56/scale:0
+[ ] norm_57/offset:0
+[ ] norm_57/scale:0
+[ ] norm_58/offset:0
+[ ] norm_58/scale:0
+[ ] norm_59/offset:0
+[ ] norm_59/scale:0
+
+Found 1871936 actor parameters.
+Optimizer applied weight decay to actor variables:
+[x] dense_24/kernel:0
+[x] dense_25/kernel:0
+[x] dense_26/kernel:0
+[x] dense_27/kernel:0
+[x] dense_28/kernel:0
+[ ] dense_28/bias:0
+[ ] norm_28/offset:0
+[ ] norm_28/scale:0
+[ ] norm_29/offset:0
+[ ] norm_29/scale:0
+[ ] norm_30/offset:0
+[ ] norm_30/scale:0
+[ ] norm_31/offset:0
+[ ] norm_31/scale:0
+
+Tracing train function.
+Existing checkpoint not found.
+Saving checkpoint: /vol/bitbucket/jk3417/explainable-mbhrl/logdir/20230405-143423/checkpoint.pkl
+Saving module with 238 tensors and 53342911 parameters.
+Start training loop.
+Tracing policy function.
+Tracing report function.
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py:12 │
+│ 4 in <module>                                                                │
+│                                                                              │
+│   121                                                                        │
+│   122                                                                        │
+│   123 if __name__ == '__main__':                                             │
+│ ❱ 124   main()                                                               │
+│   125                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py:10 │
+│ 3 in main                                                                    │
+│                                                                              │
+│   100 │   │   assert config.train.eval_fill                                  │
+│   101 │   │   eval_replay = make_replay('eval_episodes', config.replay_size  │
+│   102 │     replay = make_replay('episodes', config.replay_size)             │
+│ ❱ 103 │     train_with_viz.train_with_viz(                                   │
+│   104 │   │     agent, env, replay, eval_replay, logger, args)               │
+│   105 │   elif config.run == 'learning':                                     │
+│   106 │     assert config.replay.sync                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_ │
+│ viz.py:128 in train_with_viz                                                 │
+│                                                                              │
+│   125 │   # for name, values in scalars.items():                             │
+│   126 │   #   logger.scalar(f'eval/{name}', np.array(values, np.float64).mea │
+│   127 │   logger.write()                                                     │
+│ ❱ 128 │   driver(policy, steps=args.eval_every)                              │
+│   129 │   checkpoint.save()                                                  │
+│   130                                                                        │
+│   131                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py:42 in        │
+│ __call__                                                                     │
+│                                                                              │
+│   39   def __call__(self, policy, steps=0, episodes=0):                      │
+│   40 │   step, episode = 0, 0                                                │
+│   41 │   while step < steps or episode < episodes:                           │
+│ ❱ 42 │     step, episode = self._step(policy, step, episode)                 │
+│   43                                                                         │
+│   44   def _step(self, policy, step, episode):                               │
+│   45 │   acts, self._state = policy(self._obs, self._state, **self._kwargs)  │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py:66 in _step  │
+│                                                                              │
+│   63 │   for i in range(len(self._env)):                                     │
+│   64 │     trn = {k: v[i] for k, v in trns.items()}                          │
+│   65 │     [self._eps[i][k].append(v) for k, v in trn.items()]               │
+│ ❱ 66 │     [fn(trn, i, **self._kwargs) for fn in self._on_steps]             │
+│   67 │     step += 1                                                         │
+│   68 │   if self._obs['is_last'].any():                                      │
+│   69 │     for i, done in enumerate(self._obs['is_last']):                   │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py:66 in        │
+│ <listcomp>                                                                   │
+│                                                                              │
+│   63 │   for i in range(len(self._env)):                                     │
+│   64 │     trn = {k: v[i] for k, v in trns.items()}                          │
+│   65 │     [self._eps[i][k].append(v) for k, v in trn.items()]               │
+│ ❱ 66 │     [fn(trn, i, **self._kwargs) for fn in self._on_steps]             │
+│   67 │     step += 1                                                         │
+│   68 │   if self._obs['is_last'].any():                                      │
+│   69 │     for i, done in enumerate(self._obs['is_last']):                   │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_ │
+│ viz.py:103 in train_step                                                     │
+│                                                                              │
+│   100 │   │   for name, values in metrics.items():                           │
+│   101 │   │     logger.scalar('train/' + name, np.nanmean(values, dtype=np.f │
+│   102 │   │     metrics[name].clear()                                        │
+│ ❱ 103 │     logger.add(agent.report(batch[0]), prefix='report')              │
+│   104 │     logger.add(agent.report(next(dataset_eval)), prefix='eval')      │
+│   105 │     logger.add(timer.stats(), prefix='timer')                        │
+│   106 │     logger.write(fps=True)                                           │
+│                                                                              │
+│ /usr/lib/python3.10/contextlib.py:79 in inner                                │
+│                                                                              │
+│    76 │   │   @wraps(func)                                                   │
+│    77 │   │   def inner(*args, **kwds):                                      │
+│    78 │   │   │   with self._recreate_cm():                                  │
+│ ❱  79 │   │   │   │   return func(*args, **kwds)                             │
+│    80 │   │   return inner                                                   │
+│    81                                                                        │
+│    82                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfagent.py: │
+│ 70 in report                                                                 │
+│                                                                              │
+│    67 │     if key not in self._cached_fns:                                  │
+│    68 │   │   self._cached_fns[key] = fn.get_concrete_function(data)         │
+│    69 │     fn = self._cached_fns[key]                                       │
+│ ❱  70 │   metrics = self._strategy_run(fn, data)                             │
+│    71 │   metrics = self._convert_mets(metrics)                              │
+│    72 │   return metrics                                                     │
+│    73                                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfagent.py: │
+│ 86 in _strategy_run                                                          │
+│                                                                              │
+│    83 │   if self.strategy:                                                  │
+│    84 │     return self.strategy.run(fn, args, kwargs)                       │
+│    85 │   else:                                                              │
+│ ❱  86 │     return fn(*args, **kwargs)                                       │
+│    87                                                                        │
+│    88   def _convert_inps(self, value):                                      │
+│    89 │   if not self.strategy:                                              │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1601 in __call__                                           │
+│                                                                              │
+│   1598 │   │   `get_concrete_function`.                                      │
+│   1599 │     TypeError: If the arguments do not match the function's signatu │
+│   1600 │   """                                                               │
+│ ❱ 1601 │   return self._call_impl(args, kwargs)                              │
+│   1602                                                                       │
+│   1603   def _call_impl(self, args, kwargs, cancellation_manager=None):      │
+│   1604 │   """See `__call__` for details."""                                 │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1610 in _call_impl                                         │
+│                                                                              │
+│   1607 │     # applies first; and if not, then use the flat signature.       │
+│   1608 │     if self._function_spec is not None:                             │
+│   1609 │   │   try:                                                          │
+│ ❱ 1610 │   │     return self._call_with_structured_signature(args, kwargs,   │
+│   1611 │   │   │   │   │   │   │   │   │   │   │   │   │     cancellation_ma │
+│   1612 │   │   except TypeError as structured_err:                           │
+│   1613 │   │     try:                                                        │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1691 in _call_with_structured_signature                    │
+│                                                                              │
+│   1688 │   self._structured_signature_check_missing_args(args, kwargs)       │
+│   1689 │   self._structured_signature_check_unexpected_args(args, kwargs)    │
+│   1690 │   self._structured_signature_check_arg_types(args, kwargs)          │
+│ ❱ 1691 │   return self._call_flat(                                           │
+│   1692 │   │   filtered_flat_args,                                           │
+│   1693 │   │   captured_inputs=self.captured_inputs,                         │
+│   1694 │   │   cancellation_manager=cancellation_manager)                    │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:1853 in _call_flat                                         │
+│                                                                              │
+│   1850 │   if (possible_gradient_type == gradients_util.POSSIBLE_GRADIENT_TY │
+│   1851 │   │   and executing_eagerly):                                       │
+│   1852 │     # No tape is watching; skip to running the function.            │
+│ ❱ 1853 │     return self._build_call_outputs(self._inference_function.call(  │
+│   1854 │   │     ctx, args, cancellation_manager=cancellation_manager))      │
+│   1855 │   forward_backward = self._select_forward_and_backward_functions(   │
+│   1856 │   │   args,                                                         │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/function.py:499 in call                                                │
+│                                                                              │
+│    496 │   if executing_eagerly:                                             │
+│    497 │     with _InterpolateFunctionError(self):                           │
+│    498 │   │   if cancellation_manager is None:                              │
+│ ❱  499 │   │     outputs = execute.execute(                                  │
+│    500 │   │   │     str(self.signature.name),                               │
+│    501 │   │   │     num_outputs=self._num_outputs,                          │
+│    502 │   │   │     inputs=args,                                            │
+│                                                                              │
+│ /vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/tensorflow/python/ │
+│ eager/execute.py:54 in quick_execute                                         │
+│                                                                              │
+│    51   # pylint: disable=protected-access                                   │
+│    52   try:                                                                 │
+│    53 │   ctx.ensure_initialized()                                           │
+│ ❱  54 │   tensors = pywrap_tfe.TFE_Py_Execute(ctx._handle, device_name, op_n │
+│    55 │   │   │   │   │   │   │   │   │   │   inputs, attrs, num_outputs)    │
+│    56   except core._NotOkStatusException as e:                              │
+│    57 │   if name is not None:                                               │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ResourceExhaustedError: Graph execution error:
+
+Detected at node 'dense_32/MatMul_118/Cast' defined at (most recent call last):
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py", 
+line 124, in <module>
+      main()
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py", 
+line 103, in main
+      train_with_viz.train_with_viz(
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_viz
+.py", line 128, in train_with_viz
+      driver(policy, steps=args.eval_every)
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+42, in __call__
+      step, episode = self._step(policy, step, episode)
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+66, in _step
+      [fn(trn, i, **self._kwargs) for fn in self._on_steps]
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+66, in <listcomp>
+      [fn(trn, i, **self._kwargs) for fn in self._on_steps]
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_viz
+.py", line 103, in train_step
+      logger.add(agent.report(batch[0]), prefix='report')
+    File "/usr/lib/python3.10/contextlib.py", line 79, in inner
+      return func(*args, **kwds)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfagent.py", 
+line 68, in report
+      self._cached_fns[key] = fn.get_concrete_function(data)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 95, in report
+      mets = self.task_behavior.report(data)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 463, in report
+      for impl in ('manager', 'prior', 'replay'):
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 464, in report
+      for key, video in self.report_worker(data, impl).items():
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 480, in report_worker
+      traj = self.wm.imagine(
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 218, in imagine
+      traj = tfutils.scan(
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfutils.py", 
+line 61, in scan
+      if not static:
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfutils.py", 
+line 68, in scan
+      for index in indices:
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfutils.py", 
+line 70, in scan
+      last = fn(last, inp)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 216, in step
+      action = policy(state)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 477, in report_worker
+      worker = lambda s: self.worker.actor({
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/nets.py", line
+331, in __call__
+      for i in range(self._layers):
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/nets.py", line
+332, in __call__
+      x = self.get(f'dense{i}', Dense, self._units, **self._dense)(x)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/nets.py", line
+462, in __call__
+      x = self.get('linear', tfkl.Dense, self._units, **kw)(x)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/utils/traceback
+_utils.py", line 64, in error_handler
+      return fn(*args, **kwargs)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/engine/base_lay
+er.py", line 1096, in __call__
+      outputs = call_fn(inputs, *args, **kwargs)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/utils/traceback
+_utils.py", line 92, in error_handler
+      return fn(*args, **kwargs)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/layers/core/den
+se.py", line 219, in call
+      outputs = tf.matmul(a=inputs, b=self.kernel)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/mixed_precision
+/autocast_variable.py", line 146, in _dense_var_to_tensor
+      return tf.cast(val, self._cast_dtype)
+Node: 'dense_32/MatMul_118/Cast'
+Detected at node 'dense_32/MatMul_118/Cast' defined at (most recent call last):
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py", 
+line 124, in <module>
+      main()
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py", 
+line 103, in main
+      train_with_viz.train_with_viz(
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_viz
+.py", line 128, in train_with_viz
+      driver(policy, steps=args.eval_every)
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+42, in __call__
+      step, episode = self._step(policy, step, episode)
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+66, in _step
+      [fn(trn, i, **self._kwargs) for fn in self._on_steps]
+    File "/vol/bitbucket/jk3417/explainable-mbhrl/embodied/core/driver.py", line
+66, in <listcomp>
+      [fn(trn, i, **self._kwargs) for fn in self._on_steps]
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train_with_viz
+.py", line 103, in train_step
+      logger.add(agent.report(batch[0]), prefix='report')
+    File "/usr/lib/python3.10/contextlib.py", line 79, in inner
+      return func(*args, **kwds)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfagent.py", 
+line 68, in report
+      self._cached_fns[key] = fn.get_concrete_function(data)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 95, in report
+      mets = self.task_behavior.report(data)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 463, in report
+      for impl in ('manager', 'prior', 'replay'):
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 464, in report
+      for key, video in self.report_worker(data, impl).items():
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 480, in report_worker
+      traj = self.wm.imagine(
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 218, in imagine
+      traj = tfutils.scan(
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfutils.py", 
+line 61, in scan
+      if not static:
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfutils.py", 
+line 68, in scan
+      for index in indices:
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/tfutils.py", 
+line 70, in scan
+      last = fn(last, inp)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/agent.py", 
+line 216, in step
+      action = policy(state)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/hierarchy.py",
+line 477, in report_worker
+      worker = lambda s: self.worker.actor({
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/nets.py", line
+331, in __call__
+      for i in range(self._layers):
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/nets.py", line
+332, in __call__
+      x = self.get(f'dense{i}', Dense, self._units, **self._dense)(x)
+    File 
+"/vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/nets.py", line
+462, in __call__
+      x = self.get('linear', tfkl.Dense, self._units, **kw)(x)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/utils/traceback
+_utils.py", line 64, in error_handler
+      return fn(*args, **kwargs)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/engine/base_lay
+er.py", line 1096, in __call__
+      outputs = call_fn(inputs, *args, **kwargs)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/utils/traceback
+_utils.py", line 92, in error_handler
+      return fn(*args, **kwargs)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/layers/core/den
+se.py", line 219, in call
+      outputs = tf.matmul(a=inputs, b=self.kernel)
+    File 
+"/vol/bitbucket/jk3417/xmbhrl/lib/python3.10/site-packages/keras/mixed_precision
+/autocast_variable.py", line 146, in _dense_var_to_tensor
+      return tf.cast(val, self._cast_dtype)
+Node: 'dense_32/MatMul_118/Cast'
+2 root error(s) found.
+  (0) RESOURCE_EXHAUSTED:  failed to allocate memory
+         [[{{node dense_32/MatMul_118/Cast}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add 
+report_tensor_allocations_upon_oom to RunOptions for current allocation info. 
+This isn't available when running in Eager mode.
+
+         [[Cast_3766/_12]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add 
+report_tensor_allocations_upon_oom to RunOptions for current allocation info. 
+This isn't available when running in Eager mode.
+
+  (1) RESOURCE_EXHAUSTED:  failed to allocate memory
+         [[{{node dense_32/MatMul_118/Cast}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add 
+report_tensor_allocations_upon_oom to RunOptions for current allocation info. 
+This isn't available when running in Eager mode.
+
+0 successful operations.
+0 derived errors ignored. [Op:__inference_report_334564]
+srun: error: cloud-vm-40-226: task 0: Exited with exit code 1

@@ -2,10 +2,11 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jk3417
-#SBATCH --output=/vol/bitbucket/jk3417/explainable-mbhrl/slurm_outputs/director_result_%j.output
+#SBATCH --output=/vol/bitbucket/jk3417/explainable-mbhrl/slurm_outputs/director_result_%j.out
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
 source /vol/cuda/11.4.120-cudnn8.2.4/setup.sh
+export XLA_FLAGS=--xla_gpu_cuda_data_dir=/vol/cuda/11.4.120-cudnn8.2.4
 TERM=vt100 # or TERM=xterm
 /usr/bin/nvidia-smi
 uptime
