@@ -2,7 +2,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jk3417
-#SBATCH -=output=/vol/bitbucket/jk3417/explainable-mbhrl/slurm_outputs/director_result_%j.output
+#SBATCH --output=/vol/bitbucket/jk3417/explainable-mbhrl/slurm_outputs/director_result_%j.output
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
 source /vol/cuda/11.4.120-cudnn8.2.4/setup.sh
