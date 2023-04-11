@@ -331,4 +331,7 @@ class FlatObsWrapper(base.Wrapper):
     def step(self, action):
         obs = self.env.step(action)
         obs[self._key] = obs[self._key].reshape(self._shape)
-        return {self._key: obs[self._key]}
+        keys_to_remove = ('direction', 'mission')
+        for key in keys_to_remove:
+            obs.pop(key, None)
+        return obs
