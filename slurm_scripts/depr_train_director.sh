@@ -8,7 +8,7 @@
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
 
-readonly CUDA_VERSION=11.4.120-cudnn8.2.4
+readonly CUDA_VERSION=11.2.1-cudnn8.1.0.77
 echo "CUDA: $CUDA_VERSION"
 
 if [[ $(getconf LONG_BIT) == "32" ]]; then

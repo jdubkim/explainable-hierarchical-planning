@@ -6,9 +6,9 @@
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
 
-. /vol/cuda/11.4.120-cudnn8.2.4/setup.sh
-export XLA_FLAGS=--xla_gpu_cuda_data_dir=/vol/cuda/11.4.120-cudnn8.2.4
-python -c "import tensorflow as tf; print(tf.config.experimental.list_physical_devices(\"GPU\"))"
+. /vol/cuda/11.3.1-cudnn8.2.1/setup.sh
+export XLA_FLAGS=--xla_gpu_cuda_data_dir=/vol/cuda/11.3.1-cudnn8.2.1
+python -c "import tensorflow as tf; print(tf.config.list_physical_devices(\"GPU\"))"
 TERM=vt100 # or TERM=xterm
 /usr/bin/nvidia-smi
 uptime
