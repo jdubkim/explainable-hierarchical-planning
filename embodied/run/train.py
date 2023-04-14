@@ -1,6 +1,6 @@
 import collections
 import re
-import time # TODO: Delete after debugging
+import time  # TODO: Delete after debugging
 import warnings
 
 import embodied
@@ -77,9 +77,7 @@ def train(agent, env, replay, logger, args):
   batch = [None]
 
   def train_step(tran, worker):
-    train_start = time.time()
     if should_train(step):
-      print(f"Train agent for {args.train_steps} steps.")
       for _ in range(args.train_steps):
         batch[0] = next(dataset)
         outs, state[0], mets = agent.train(batch[0], state[0])
@@ -95,8 +93,6 @@ def train(agent, env, replay, logger, args):
       logger.add(agent.report(batch[0]), prefix='report')
       logger.add(timer.stats(), prefix='timer')
       logger.write(fps=True)
-    train_end = time.time()
-    print(f'Train time for train_step: {train_end - train_start} seconds.')
 
   driver.on_step(train_step)
 
@@ -120,6 +116,6 @@ def train(agent, env, replay, logger, args):
   while step < args.steps:
     driver(policy, steps=args.eval_every)
     checkpoint.save()
-  
+
   driver_end = time.time()
   print(f'Driver time: {driver_end - policy_end} seconds.')

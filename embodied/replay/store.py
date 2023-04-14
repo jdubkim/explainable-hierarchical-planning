@@ -126,12 +126,14 @@ class DiskStore:
 
   @staticmethod
   def _save(filename, traj):
+    start = timelib.time()
     filename = embodied.Path(filename)
     with io.BytesIO() as stream:
       np.savez_compressed(stream, **traj)
       stream.seek(0)
       filename.write(stream.read(), mode='wb')
-    print(f'Saved episode: {filename.name}')
+    end = timelib.time()
+    print(f'Saved episode: {filename.name}. Took {end - start:.2f}s.')
 
   def _enforce_limit(self):
     if not self.capacity:
