@@ -81,7 +81,9 @@ def train(agent, env, replay, logger, args):
       for _ in range(args.train_steps):
         batch[0] = next(dataset)
         outs, state[0], mets = agent.train(batch[0], state[0])
-        [metrics[key].append(value) for key, value in mets.items()]
+        for key, value in mets.items():
+          metrics[key].append(value)
+        # [metrics[key].append(value) for key, value in mets.items()]
         if 'priority' in outs:
           replay.prioritize(outs['key'], outs['priority'])
     if should_log(step):
