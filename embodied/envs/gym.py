@@ -22,8 +22,10 @@ class Gym(embodied.Env):
   def obs_space(self):
     if self._obs_dict:
       spaces = self._env.observation_space.spaces.copy()
+      # Flatten the nested dictionaries into a single dictionary.
       spaces = self._flatten(spaces)
     else:
+      # If the observation space is not a dictionary, then we assume that it is
       spaces = {self._obs_key: self._env.observation_space}
     spaces = {k: self._convert(v) for k, v in spaces.items()}
     return {
@@ -38,10 +40,12 @@ class Gym(embodied.Env):
   def act_space(self):
     if self._act_dict:
       spaces = self._env.action_space.spaces.copy()
+      # Flatten the nested dictionaries into a single dictionary.
       spaces = self._flatten(spaces)
     else:
       spaces = {self._act_key: self._env.action_space}
     spaces = {k: self._convert(v) for k, v in spaces.items()}
+    # Add a reset action.
     spaces['reset'] = embodied.Space(bool)
     return spaces
 
@@ -55,22 +59,24 @@ class Gym(embodied.Env):
     else:
       action = action[self._act_key]
     obs, reward, self._done, self._info = self._env.step(action)
-    return self._obs(
-        obs, reward,
-        is_last=bool(self._done),
-        is_terminal=bool(self._info.get('is_terminal', self._done)))
+    return self._obs(obs,
+                     reward,
+                     is_last=bool(self._done),
+                     is_terminal=bool(self._info.get('is_terminal',
+                                                     self._done)))
 
-  def _obs(
-      self, obs, reward, is_first=False, is_last=False, is_terminal=False):
+  def _obs(self, obs, reward, is_first=False, is_last=False, is_terminal=False):
+    """
+    Convert the observation, reward and done to a dictionary.
+    """
     if not self._obs_dict:
       obs = {self._obs_key: obs}
     obs = self._flatten(obs)
     obs = {k: np.array(v) for k, v in obs.items()}
-    obs.update(
-        reward=np.float32(reward),
-        is_first=is_first,
-        is_last=is_last,
-        is_terminal=is_terminal)
+    obs.update(reward=np.float32(reward),
+               is_first=is_first,
+               is_last=is_last,
+               is_terminal=is_terminal)
     return obs
 
   def render(self):

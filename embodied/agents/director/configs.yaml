@@ -179,14 +179,14 @@ dmc_proprio:
 
 minigrid_vision:
 
-  task: minigrid_door_key_vision
+  task: minigrid_doorkey_vision
   encoder: {mlp_keys: '$^', cnn_keys: 'image'}
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
   env.repeat: 1
 
 minigrid_flat:
 
-  task: minigrid_door_key_flat
+  task: minigrid_doorkey_flat
   encoder: {mlp_keys: '.*', cnn_keys: '$^'}
   decoder: {mlp_keys: '.*', cnn_keys: '$^'}
   env.repeat: 1

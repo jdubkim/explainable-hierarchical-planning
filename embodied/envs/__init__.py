@@ -27,8 +27,8 @@ def load_single_env(
         length=0, logdir='/dev/null', discretize=0, sticky=True, lives=False,
         episodic=True, again=False, termination=False, weaker=1.0, checks=False,
         seed=None):
+    # Example: dmc_walker_walk -> dmc, walker_walk
     suite, task = task.split('_', 1)
-    print("suite: ", suite, "\ttask: ", task)
     if suite == 'dummy':
         from . import dummy
         env = dummy.Dummy(task, size, length or 100)
@@ -77,6 +77,7 @@ def load_single_env(
         from . import minigrid
         env = minigrid.MiniGrid(task)
         if task == 'doorkey_flat':
+            # Add a wrapper that flattens the image input to a vector.
             env = embodied.wrappers.FlatObsWrapper(env)
     else:
         raise NotImplementedError(suite)
