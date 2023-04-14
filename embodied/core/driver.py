@@ -98,8 +98,9 @@ class Driver:
       for fn in self._on_steps:
         fn(trn, i, **self._kwargs)
         time_after = timelib.time()
-        print(f"DEBUG [_step, driver] Time after step callback: {fn.__name__}",
-              time_after - time_last)
+        print(
+            f"DEBUG [_step, driver] Time after step callback: {fn.__qualname__}",
+            time_after - time_last)
         time_last = time_after
 
       # [fn(trn, i, **self._kwargs) for fn in self._on_steps]
@@ -122,7 +123,7 @@ class Driver:
           fn(ep.copy(), i, **self._kwargs)
           time_after = timelib.time()
           print(
-              f"DEBUG [_step, driver] Time after episode callback: {fn.__name__}",
+              f"DEBUG [_step, driver] Time after episode callback: {fn.__qualname__}",
               time_after - time_last)
           time_last = time_after
         episode += 1
