@@ -1,6 +1,5 @@
 import collections
 import re
-import time  # TODO: Delete after debugging
 import warnings
 
 import embodied
