@@ -319,7 +319,7 @@ class ImageEncoderSimple(tfutils.Module):
     self._kw = kw
 
   def __call__(self, features):
-    Conv = functools.partial(Conv2D, stride=2, pad='valid')
+    Conv = functools.partial(Conv2D, pad='valid')
     x = features.astype(prec.global_policy().compute_dtype)
     depth = self._depth
     for i, (kernel, stride) in enumerate(zip(self._kernels, self._strides)):
