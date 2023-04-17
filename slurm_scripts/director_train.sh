@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --gres=gpu:1
+#SBATCH --partition gpgpu
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jk3417
 #SBATCH --output=/vol/bitbucket/jk3417/explainable-mbhrl/slurm_outputs/director_result_%j.out
@@ -8,7 +9,6 @@ source activate
 
 . /vol/cuda/11.3.1-cudnn8.2.1/setup.sh
 export XLA_FLAGS=--xla_gpu_cuda_data_dir=/vol/cuda/11.3.1-cudnn8.2.1
-python -c "import tensorflow as tf; print(tf.config.list_physical_devices(\"GPU\"))"
 TERM=vt100 # or TERM=xterm
 /usr/bin/nvidia-smi
 uptime
