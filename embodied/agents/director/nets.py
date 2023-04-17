@@ -13,9 +13,13 @@ from . import tfutils
 
 class RSSM(tfutils.Module):
 
-  def __init__(
-      self, deter=1024, stoch=32, classes=32, unroll=True, initial='zeros',
-      **kw):
+  def __init__(self,
+               deter=1024,
+               stoch=32,
+               classes=32,
+               unroll=True,
+               initial='zeros',
+               **kw):
     super().__init__()
     self._deter = deter
     self._stoch = stoch
@@ -28,36 +32,46 @@ class RSSM(tfutils.Module):
   def initial(self, batch_size):
     dtype = prec.global_policy().compute_dtype
     if self._classes:
-      state = dict(
-          deter=tf.zeros([batch_size, self._deter], dtype),
-          logit=tf.zeros([batch_size, self._stoch, self._classes], dtype),
-          stoch=tf.zeros([batch_size, self._stoch, self._classes], dtype))
+      state = dict(deter=tf.zeros([batch_size, self._deter], dtype),
+                   logit=tf.zeros([batch_size, self._stoch, self._classes],
+                                  dtype),
+                   stoch=tf.zeros([batch_size, self._stoch, self._classes],
+                                  dtype))
     else:
-      state = dict(
-          deter=tf.zeros([batch_size, self._deter], dtype),
-          mean=tf.zeros([batch_size, self._stoch], dtype),
-          std=tf.ones([batch_size, self._stoch], dtype),
-          stoch=tf.zeros([batch_size, self._stoch], dtype))
+      state = dict(deter=tf.zeros([batch_size, self._deter], dtype),
+                   mean=tf.zeros([batch_size, self._stoch], dtype),
+                   std=tf.ones([batch_size, self._stoch], dtype),
+                   stoch=tf.zeros([batch_size, self._stoch], dtype))
     if self._initial == 'zeros':
       return state
     elif self._initial == 'learned':
       # This will cut gradients when the state is created outside of the
       # training graph, but this only happens once at the beginning of the
       # training loop. Afterwards, the state is reset inside the obs_step().
-      state['deter'] = tf.repeat(self._cast(self.get(
-          'initial_deter', tf.Variable, state['deter'][0].astype(tf.float32),
-          trainable=True))[None], batch_size, 0)
-      state['stoch'] = tf.repeat(self._cast(self.get(
-          'initial_stoch', tf.Variable, state['stoch'][0].astype(tf.float32),
-          trainable=True))[None], batch_size, 0)
+      state['deter'] = tf.repeat(
+          self._cast(
+              self.get('initial_deter',
+                       tf.Variable,
+                       state['deter'][0].astype(tf.float32),
+                       trainable=True))[None], batch_size, 0)
+      state['stoch'] = tf.repeat(
+          self._cast(
+              self.get('initial_stoch',
+                       tf.Variable,
+                       state['stoch'][0].astype(tf.float32),
+                       trainable=True))[None], batch_size, 0)
       return state
     elif self._initial == 'learned2':
       # This will cut gradients when the state is created outside of the
       # training graph, but this only happens once at the beginning of the
       # training loop. Afterwards, the state is reset inside the obs_step().
-      state['deter'] = tf.repeat(self._cast(tf.math.tanh(self.get(
-          'initial_deter', tf.Variable, state['deter'][0].astype(tf.float32),
-          trainable=True)))[None], batch_size, 0)
+      state['deter'] = tf.repeat(
+          self._cast(
+              tf.math.tanh(
+                  self.get('initial_deter',
+                           tf.Variable,
+                           state['deter'][0].astype(tf.float32),
+                           trainable=True)))[None], batch_size, 0)
       state['stoch'] = self.get_stoch(state['deter'])
       return state
     else:
@@ -171,23 +185,33 @@ class RSSM(tfutils.Module):
 
 class MultiEncoder(tfutils.Module):
 
-  def __init__(
-      self, shapes, cnn_keys=r'.*', mlp_keys=r'.*', mlp_layers=4,
-      mlp_units=512, cnn='simple', cnn_depth=48, cnn_kernels=(4, 4, 4, 4),
-      cnn_blocks=2, **kw):
+  def __init__(self,
+               shapes,
+               cnn_keys=r'.*',
+               mlp_keys=r'.*',
+               mlp_layers=4,
+               mlp_units=512,
+               cnn='simple',
+               cnn_depth=48,
+               cnn_kernels=(4, 4, 4, 4),
+               strides=(2, 2, 2, 2),
+               cnn_blocks=2,
+               **kw):
     excluded = ('is_first', 'is_last')
     shapes = {k: v for k, v in shapes.items() if k not in excluded}
     self.cnn_shapes = {
-        k: v for k, v in shapes.items()
-        if re.match(cnn_keys, k) and len(v) == 3}
+        k: v for k, v in shapes.items() if re.match(cnn_keys, k) and len(v) == 3
+    }
     self.mlp_shapes = {
-        k: v for k, v in shapes.items()
-        if re.match(mlp_keys, k) and len(v) in (0, 1)}
+        k: v
+        for k, v in shapes.items()
+        if re.match(mlp_keys, k) and len(v) in (0, 1)
+    }
     self.shapes = {**self.cnn_shapes, **self.mlp_shapes}
     print('Encoder CNN shapes:', self.cnn_shapes)
     print('Encoder MLP shapes:', self.mlp_shapes)
     if cnn == 'simple':
-      self._cnn = ImageEncoderSimple(cnn_depth, cnn_kernels, **kw)
+      self._cnn = ImageEncoderSimple(cnn_depth, cnn_kernels, strides, **kw)
     else:
       raise NotImplementedError(cnn)
     if self.mlp_shapes:
@@ -199,7 +223,8 @@ class MultiEncoder(tfutils.Module):
     batch_dims = tuple(data[some_key].shape[:-len(some_shape)])
     data = {
         k: tf.reshape(v, (-1,) + tuple(v.shape)[len(batch_dims):])
-        for k, v in data.items()}
+        for k, v in data.items()
+    }
     outputs = []
     if self.cnn_shapes:
       inputs = tf.concat([data[k] for k in self.cnn_shapes], -1)
@@ -209,7 +234,8 @@ class MultiEncoder(tfutils.Module):
     if self.mlp_shapes:
       inputs = [
           data[k][..., None] if len(self.shapes[k]) == 0 else data[k]
-          for k in self.mlp_shapes]
+          for k in self.mlp_shapes
+      ]
       inputs = tf.concat([self._cast(x) for x in inputs], -1)
       outputs.append(self._mlp(inputs))
     outputs = tf.concat(outputs, -1)
@@ -219,18 +245,27 @@ class MultiEncoder(tfutils.Module):
 
 class MultiDecoder(tfutils.Module):
 
-  def __init__(
-      self, shapes, inputs=['tensor'], cnn_keys=r'.*', mlp_keys=r'.*',
-      mlp_layers=4, mlp_units=512, cnn='simple', cnn_depth=48,
-      cnn_kernels=(5, 5, 6, 6), image_dist='mse', **kw):
+  def __init__(self,
+               shapes,
+               inputs=['tensor'],
+               cnn_keys=r'.*',
+               mlp_keys=r'.*',
+               mlp_layers=4,
+               mlp_units=512,
+               cnn='simple',
+               cnn_depth=48,
+               cnn_kernels=(5, 5, 6, 6),
+               strides=(2, 2, 2, 2),
+               image_dist='mse',
+               **kw):
     excluded = ('is_first', 'is_last', 'is_terminal', 'reward')
     shapes = {k: v for k, v in shapes.items() if k not in excluded}
     self.cnn_shapes = {
-        k: v for k, v in shapes.items()
-        if re.match(cnn_keys, k) and len(v) == 3}
+        k: v for k, v in shapes.items() if re.match(cnn_keys, k) and len(v) == 3
+    }
     self.mlp_shapes = {
-        k: v for k, v in shapes.items()
-        if re.match(mlp_keys, k) and len(v) == 1}
+        k: v for k, v in shapes.items() if re.match(mlp_keys, k) and len(v) == 1
+    }
     self.shapes = {**self.cnn_shapes, **self.mlp_shapes}
     print('Decoder CNN shapes:', self.cnn_shapes)
     print('Decoder MLP shapes:', self.mlp_shapes)
@@ -239,7 +274,8 @@ class MultiDecoder(tfutils.Module):
       assert all(x[:-1] == shapes[0][:-1] for x in shapes)
       merged = shapes[0][:-1] + (sum(x[-1] for x in shapes),)
       if cnn == 'simple':
-        self._cnn = ImageDecoderSimple(merged, cnn_depth, cnn_kernels, **kw)
+        self._cnn = ImageDecoderSimple(merged, cnn_depth, cnn_kernels, strides,
+                                       **kw)
       else:
         raise NotImplementedError(cnn)
     if self.mlp_shapes:
@@ -257,7 +293,8 @@ class MultiDecoder(tfutils.Module):
       means = tf.split(output, [v[-1] for v in self.cnn_shapes.values()], -1)
       dists.update({
           key: self._make_image_dist(key, mean)
-          for (key, shape), mean in zip(self.cnn_shapes.items(), means)})
+          for (key, shape), mean in zip(self.cnn_shapes.items(), means)
+      })
     if self.mlp_shapes:
       dists.update(self._mlp(features))
     return dists
@@ -273,38 +310,46 @@ class MultiDecoder(tfutils.Module):
 
 class ImageEncoderSimple(tfutils.Module):
 
-  def __init__(self, depth, kernels, **kw):
+  def __init__(self, depth, kernels, strides, **kw):
     self._depth = depth
     self._kernels = kernels
+    self._strides = strides if isinstance(strides,
+                                          (list,
+                                           tuple)) else [strides] * len(kernels)
     self._kw = kw
 
   def __call__(self, features):
     Conv = functools.partial(Conv2D, stride=2, pad='valid')
     x = features.astype(prec.global_policy().compute_dtype)
     depth = self._depth
-    for i, kernel in enumerate(self._kernels):
-      x = self.get(f'conv{i}', Conv, depth, kernel, **self._kw)(x)
+    for i, (kernel, stride) in enumerate(zip(self._kernels, self._strides)):
+      x = self.get(f'conv{i}', Conv, depth, kernel, stride, **self._kw)(x)
       depth *= 2
     return x
 
 
 class ImageDecoderSimple(tfutils.Module):
 
-  def __init__(self, shape, depth, kernels, **kw):
+  def __init__(self, shape, depth, kernels, strides, **kw):
     self._shape = shape
     self._depth = depth
     self._kernels = kernels
+    self._strides = strides if isinstance(strides,
+                                          (list,
+                                           tuple)) else [strides] * len(kernels)
+    assert len(self._kernels) == len(self._strides)
     self._kw = kw
 
   def __call__(self, features):
-    ConvT = functools.partial(Conv2D, transp=True, stride=2, pad='valid')
+    ConvT = functools.partial(Conv2D, transp=True, pad='valid')
     x = tf.cast(features, prec.global_policy().compute_dtype)
     x = tf.reshape(x, [-1, 1, 1, x.shape[-1]])
-    depth = self._depth * 2 ** (len(self._kernels) - 2)
-    for i, kernel in enumerate(self._kernels[:-1]):
-      x = self.get(f'conv{i}', ConvT, depth, kernel, **self._kw)(x)
+    depth = self._depth * 2**(len(self._kernels) - 2)
+    for i, (kernel, stride) in enumerate(zip(self._kernels, self._strides)):
+      x = self.get(f'conv{i}', ConvT, depth, kernel, stride, **self._kw)(x)
       depth //= 2
-    x = self.get('out', ConvT, self._shape[-1], self._kernels[-1])(x)
+    x = self.get('out', ConvT, self._shape[-1], self._kernels[-1],
+                 self._strides[-1])(x)
     x = tf.math.sigmoid(x)
     assert x.shape[-3:] == self._shape, (x.shape, self._shape)
     return x
@@ -346,9 +391,13 @@ class MLP(tfutils.Module):
 
 class DistLayer(tfutils.Module):
 
-  def __init__(
-      self, shape, dist='mse', outscale=0.1, minstd=0.1, maxstd=1.0,
-      unimix=0.0):
+  def __init__(self,
+               shape,
+               dist='mse',
+               outscale=0.1,
+               minstd=0.1,
+               maxstd=1.0,
+               unimix=0.0):
     assert all(isinstance(dim, int) for dim in shape), shape
     self._shape = shape
     self._dist = dist
@@ -359,8 +408,8 @@ class DistLayer(tfutils.Module):
 
   def __call__(self, inputs):
     dist = self.inner(inputs)
-    assert tuple(dist.batch_shape) == tuple(inputs.shape[:-1]), (
-        dist.batch_shape, dist.event_shape, inputs.shape)
+    assert tuple(dist.batch_shape) == tuple(
+        inputs.shape[:-1]), (dist.batch_shape, dist.event_shape, inputs.shape)
     return dist
 
   def inner(self, inputs):
@@ -368,8 +417,8 @@ class DistLayer(tfutils.Module):
     if self._outscale == 0.0:
       kw['kernel_initializer'] = tfki.Zeros()
     else:
-      kw['kernel_initializer'] = tfki.VarianceScaling(
-          self._outscale, 'fan_avg', 'uniform')
+      kw['kernel_initializer'] = tfki.VarianceScaling(self._outscale, 'fan_avg',
+                                                      'uniform')
     out = self.get('out', tfkl.Dense, np.prod(self._shape), **kw)(inputs)
     out = tf.reshape(out, tuple(inputs.shape[:-1]) + self._shape)
     out = tf.cast(out, tf.float32)
@@ -429,9 +478,15 @@ class DistLayer(tfutils.Module):
 
 class Conv2D(tfutils.Module):
 
-  def __init__(
-      self, depth, kernel, stride=1, transp=False, act='none', norm='none',
-      pad='same', bias=True):
+  def __init__(self,
+               depth,
+               kernel,
+               stride=1,
+               transp=False,
+               act='none',
+               norm='none',
+               pad='same',
+               bias=True):
     kwargs = {}
     kwargs['use_bias'] = bias and norm == 'none'
     if transp:
@@ -476,10 +531,9 @@ class Norm(tfutils.Module, tf.keras.layers.Layer):
       self.layer = tfkl.LayerNormalization()
       self.layer.build(input_shape)
     elif self._impl == 'layer':
-      self.scale = self.add_weight(
-          'scale', input_shape[-1], tf.float32, 'Ones')
-      self.offset = self.add_weight(
-          'offset', input_shape[-1], tf.float32, 'Zeros')
+      self.scale = self.add_weight('scale', input_shape[-1], tf.float32, 'Ones')
+      self.offset = self.add_weight('offset', input_shape[-1], tf.float32,
+                                    'Zeros')
 
   def call(self, x):
     if self._impl == 'none':
@@ -488,8 +542,8 @@ class Norm(tfutils.Module, tf.keras.layers.Layer):
       return self.layer(x)
     elif self._impl == 'layer':
       mean, var = tf.nn.moments(x, -1, keepdims=True)
-      return tf.nn.batch_normalization(
-          x, mean, var, self.offset, self.scale, 1e-3)
+      return tf.nn.batch_normalization(x, mean, var, self.offset, self.scale,
+                                       1e-3)
     else:
       raise NotImplementedError(self._impl)
 
@@ -512,8 +566,8 @@ class Input:
     dims = len(inputs[self._dims].shape)
     for i, value in enumerate(values):
       if len(value.shape) > dims:
-        values[i] = value.reshape(
-            value.shape[:dims - 1] + [np.prod(value.shape[dims - 1:])])
+        values[i] = value.reshape(value.shape[:dims - 1] +
+                                  [np.prod(value.shape[dims - 1:])])
     values = [x.astype(inputs[self._dims].dtype) for x in values]
     return tf.concat(values, -1)
 
