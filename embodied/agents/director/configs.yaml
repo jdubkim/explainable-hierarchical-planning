@@ -180,8 +180,19 @@ dmc_proprio:
 minigrid_vision:
 
   task: minigrid_doorkey_vision
-  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 128, cnn_depth: 16, cnn_kernels: [3, 3, 3]}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 128, cnn_depth: 16, cnn_kernels: [5, 5, 6, 6]}
+  rssm: {units: 128, deter: 128, stoch: 32, classes: 32}
+  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 128, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 128, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  reward_head: {layers: 2, units: 32}
+  cont_head: {layers: 2, units: 32}
+  actor: {layers: 2, units: 32}
+  critic: {layers: 2, units: 32}
+  goal_encoder: {layers: 2, units: 32}
+  goal_decoder: {layers: 2, units: 32}
+  disag_head: {layers: 2, units: 32}
+  ctrl_embed: {layers: 2, units: 32}
+  expl_enc: {layers: 2, units: 32}
+  expl_dec: {layers: 2, units: 32}
   env.repeat: 1
 
 minigrid_flat:

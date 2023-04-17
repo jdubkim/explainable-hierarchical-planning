@@ -25,7 +25,8 @@ class MiniGrid(embodied.Env):
   @functools.cached_property
   def obs_space(self):
     if self._obs_dict:
-      spaces = self._env.observation_space.spaces.copy()
+      # Only use the observation space for the specified key.
+      spaces = {self._obs_key: self._env.observation_space.spaces.get(self._obs_key)}
       spaces = self._flatten(spaces)
     else:
       spaces = {self._obs_key: self._env.observation_space}
@@ -68,6 +69,8 @@ class MiniGrid(embodied.Env):
   def _obs(self, obs, reward, is_first=False, is_last=False, is_terminal=False):
     if not self._obs_dict:
       obs = {self._obs_key: obs}
+    else:
+      obs = {self._obs_key: obs.get(self._obs_key, {})}
     obs = self._flatten(obs)
     obs = {k: np.array(v) for k, v in obs.items()}
     obs.update(reward=np.float32(reward),
