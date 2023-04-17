@@ -345,7 +345,8 @@ class ImageDecoderSimple(tfutils.Module):
     x = tf.cast(features, prec.global_policy().compute_dtype)
     x = tf.reshape(x, [-1, 1, 1, x.shape[-1]])
     depth = self._depth * 2**(len(self._kernels) - 2)
-    for i, (kernel, stride) in enumerate(zip(self._kernels, self._strides)):
+    for i, (kernel,
+            stride) in enumerate(zip(self._kernels[:-1], self._strides[:-1])):
       x = self.get(f'conv{i}', ConvT, depth, kernel, stride, **self._kw)(x)
       depth //= 2
     x = self.get('out', ConvT, self._shape[-1], self._kernels[-1],
