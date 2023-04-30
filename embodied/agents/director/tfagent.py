@@ -150,6 +150,7 @@ class TFAgent(tfutils.Module, embodied.Agent):
         tf.config.experimental.enable_tensor_float_32_execution(self.config.tensorfloat)
 
         gpus = tf.config.experimental.list_physical_devices("GPU")
+        print("GPU status: ", gpus)
         if self.config.logical_gpus:
             conf = tf.config.LogicalDeviceConfiguration(memory_limit=1024)
             tf.config.set_logical_device_configuration(
@@ -160,7 +161,7 @@ class TFAgent(tfutils.Module, embodied.Agent):
             return None
 
         elif self.config.platform == "gpu":
-            assert len(gpus) >= 1, gpus
+            assert len(gpus) >= 1
             if not self.config.logical_gpus:
                 for gpu in gpus:
                     tf.config.experimental.set_memory_growth(gpu, self.config.growth)

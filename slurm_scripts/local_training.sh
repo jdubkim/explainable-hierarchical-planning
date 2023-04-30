@@ -1,7 +1,8 @@
 #!/bin/bash
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
-source /vol/cuda/11.4.120-cudnn8.2.4/setup.sh
+source /vol/cuda/11.3.1-cudnn8.2.1/setup.sh
+export XLA_FLAGS=--xla_gpu_cuda_data_dir=/vol/cuda/11.3.1-cudnn8.2.1
 /usr/bin/nvidia-smi
 
 echo "Using config: $1."

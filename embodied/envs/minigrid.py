@@ -1,14 +1,18 @@
 import functools
 
 import embodied
-import gym
 import numpy as np
+import gym
+import gym_minigrid
 
 
-class Gym(embodied.Env):
+class MiniGrid(embodied.Env):
 
-  def __init__(self, env, obs_key='image', act_key='action'):
-    self._env = gym.make(env) if isinstance(env, str) else env
+  def __init__(self, task, obs_key='image', act_key='action'):
+    assert task in ('doorkey_flat', 'doorkey_vision')
+    self._env = gym.make('MiniGrid-FourRooms-v0')
+    self._obs_dict = isinstance(self._env.observation_space.spaces, dict)
+    self._act_dict = isinstance(self._env.action_space, dict)
     self._obs_key = obs_key
     self._act_key = act_key
     self._done = True
@@ -21,11 +25,10 @@ class Gym(embodied.Env):
   @functools.cached_property
   def obs_space(self):
     if self._obs_dict:
-      spaces = self._env.observation_space.spaces.copy()
-      # Flatten the nested dictionaries into a single dictionary.
+      # Only use the observation space for the specified key.
+      spaces = {self._obs_key: self._env.observation_space.spaces.get(self._obs_key)}
       spaces = self._flatten(spaces)
     else:
-      # If the observation space is not a dictionary, then we assume that it is
       spaces = {self._obs_key: self._env.observation_space}
     spaces = {k: self._convert(v) for k, v in spaces.items()}
     return {
@@ -40,12 +43,10 @@ class Gym(embodied.Env):
   def act_space(self):
     if self._act_dict:
       spaces = self._env.action_space.spaces.copy()
-      # Flatten the nested dictionaries into a single dictionary.
       spaces = self._flatten(spaces)
     else:
       spaces = {self._act_key: self._env.action_space}
     spaces = {k: self._convert(v) for k, v in spaces.items()}
-    # Add a reset action.
     spaces['reset'] = embodied.Space(bool)
     return spaces
 
@@ -66,11 +67,10 @@ class Gym(embodied.Env):
                                                      self._done)))
 
   def _obs(self, obs, reward, is_first=False, is_last=False, is_terminal=False):
-    """
-    Convert the observation, reward and done to a dictionary.
-    """
     if not self._obs_dict:
       obs = {self._obs_key: obs}
+    else:
+      obs = {self._obs_key: obs.get(self._obs_key, {})}
     obs = self._flatten(obs)
     obs = {k: np.array(v) for k, v in obs.items()}
     obs.update(reward=np.float32(reward),
@@ -89,9 +89,12 @@ class Gym(embodied.Env):
       pass
 
   def _flatten(self, nest, prefix=None):
+    """
+    Flatten a nested dictionary into a single dictionary. 
+    """
     result = {}
     for key, value in nest.items():
-      key = prefix + '/' + key if prefix else key
+      key = f'{prefix}/{key}' if prefix else key
       if isinstance(value, gym.spaces.Dict):
         value = value.spaces
       if isinstance(value, dict):
@@ -101,6 +104,9 @@ class Gym(embodied.Env):
     return result
 
   def _unflatten(self, flat):
+    """
+    Unflatten a dictionary into a nested dictionary. 
+    """
     result = {}
     for key, value in flat.items():
       parts = key.split('/')

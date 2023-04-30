@@ -6,6 +6,8 @@ import numpy as np
 
 
 def acting(agent, env, replay, logger, actordir, args):
+  """ Act in the environment and store the results in a replay buffer.
+  """
 
   logdir = embodied.Path(args.logdir)
   logdir.mkdirs()
@@ -22,6 +24,7 @@ def acting(agent, env, replay, logger, actordir, args):
   timer.wrap('env', env, ['step'])
 
   nonzeros = set()
+
   def per_episode(ep):
     metrics = {}
     length = len(ep['reward']) - 1
@@ -71,8 +74,9 @@ def acting(agent, env, replay, logger, actordir, args):
   agent_cp.agent = agent
 
   print('Start collection loop.')
-  policy = lambda *args: agent.policy(
-      *args, mode='explore' if should_expl(step) else 'train')
+  policy = lambda *args: agent.policy(*args,
+                                      mode='explore'
+                                      if should_expl(step) else 'train')
 
   while step < args.steps:
     if should_sync(step):

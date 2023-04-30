@@ -58,6 +58,8 @@ class RAMStore:
 
 
 class DiskStore:
+  """A disk-based replay buffer.
+  """
 
   def __init__(self, directory, capacity=None, parallel=False):
     self.directory = embodied.Path(directory)
@@ -124,12 +126,14 @@ class DiskStore:
 
   @staticmethod
   def _save(filename, traj):
+    start = timelib.time()
     filename = embodied.Path(filename)
     with io.BytesIO() as stream:
       np.savez_compressed(stream, **traj)
       stream.seek(0)
       filename.write(stream.read(), mode='wb')
-    print(f'Saved episode: {filename.name}')
+    end = timelib.time()
+    print(f'Saved episode: {filename.name}. Took {end - start:.2f}s.')
 
   def _enforce_limit(self):
     if not self.capacity:
@@ -146,14 +150,16 @@ class DiskStore:
 
   def _parse(self, filename):
     time, key, length, reward = filename.stem.split('-')
-    time = timelib.mktime(timelib.strptime(
-        time, '%Y%m%dT%H%M%S')) - timelib.timezone
+    time = timelib.mktime(timelib.strptime(time,
+                                           '%Y%m%dT%H%M%S')) - timelib.timezone
     length = int(length.strip('len'))
     reward = int(reward.strip('rew').replace('m', '-'))
     return time, key, length, reward
 
 
 class CkptRAMStore:
+  """RAM buffer that can sync with trajectories on disk.
+  """
 
   def __init__(self, directory, capacity=None, parallel=False):
     self.disk_store = DiskStore(directory, capacity, parallel)
@@ -245,8 +251,9 @@ class StoreServer:
 
   def __init__(self, store, port):
     self.store = store
-    self.thread = threading.Thread(
-        target=self._server, args=(port,), daemon=True)
+    self.thread = threading.Thread(target=self._server,
+                                   args=(port,),
+                                   daemon=True)
     self.thread.start()
 
   def __getattr__(self, name):

@@ -7,7 +7,6 @@ import numpy as np
 
 
 def train(agent, env, replay, logger, args):
-
   logdir = embodied.Path(args.logdir)
   logdir.mkdirs()
   print('Logdir', logdir)
@@ -24,6 +23,7 @@ def train(agent, env, replay, logger, args):
     timer.wrap('replay', replay, ['_sample'])
 
   nonzeros = set()
+
   def per_episode(ep):
     metrics = {}
     length = len(ep['reward']) - 1
@@ -56,26 +56,33 @@ def train(agent, env, replay, logger, args):
   driver.on_step(lambda tran, _: step.increment())
   driver.on_step(replay.add)
 
+  pretrain_start = time.time()
   train_fill = max(0, args.train_fill - len(replay))
   if train_fill:
     print(f'Fill train dataset ({train_fill} steps).')
     random_agent = embodied.RandomAgent(env.act_space)
     driver(random_agent.policy, steps=train_fill, episodes=1)
+  pretrain_end = time.time()
+  print(f'Pretrain time: {pretrain_end - pretrain_start} seconds.')
 
   dataset = iter(agent.dataset(replay.dataset))
   state = [None]  # To be writable from train step function below.
   assert args.pretrain > 0  # At least one step to initialize variables.
+  print(f"Pretrain agent for {args.pretrain} steps.")
   for _ in range(args.pretrain):
     _, state[0], _ = agent.train(next(dataset), state[0])
 
   metrics = collections.defaultdict(list)
   batch = [None]
+
   def train_step(tran, worker):
     if should_train(step):
       for _ in range(args.train_steps):
         batch[0] = next(dataset)
         outs, state[0], mets = agent.train(batch[0], state[0])
-        [metrics[key].append(value) for key, value in mets.items()]
+        for key, value in mets.items():
+          metrics[key].append(value)
+        # [metrics[key].append(value) for key, value in mets.items()]
         if 'priority' in outs:
           replay.prioritize(outs['key'], outs['priority'])
     if should_log(step):
@@ -87,17 +94,29 @@ def train(agent, env, replay, logger, args):
       logger.add(agent.report(batch[0]), prefix='report')
       logger.add(timer.stats(), prefix='timer')
       logger.write(fps=True)
+
   driver.on_step(train_step)
 
+  ckp_start = time.time()
   checkpoint = embodied.Checkpoint(logdir / 'checkpoint.pkl')
   checkpoint.step = step
   checkpoint.agent = agent
   checkpoint.replay = replay
   checkpoint.load_or_save()
+  ckp_end = time.time()
+  print(f'Checkpoint time: {ckp_end - ckp_start} seconds.')
 
   print('Start training loop.')
-  policy = lambda *args: agent.policy(
-      *args, mode='explore' if should_expl(step) else 'train')
+  policy_start = time.time()
+  policy = lambda *args: agent.policy(*args,
+                                      mode='explore'
+                                      if should_expl(step) else 'train')
+  policy_end = time.time()
+  print(f'Policy time: {policy_end - policy_start} seconds.')
+
   while step < args.steps:
     driver(policy, steps=args.eval_every)
     checkpoint.save()
+
+  driver_end = time.time()
+  print(f'Driver time: {driver_end - policy_end} seconds.')

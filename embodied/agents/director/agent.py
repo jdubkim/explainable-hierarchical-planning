@@ -1,4 +1,5 @@
 import sys
+import time
 
 import embodied
 import ruamel.yaml as yaml
@@ -14,8 +15,8 @@ from . import tfutils
 
 class Agent(tfagent.TFAgent):
 
-  configs = yaml.YAML(typ='safe').load((
-      embodied.Path(sys.argv[0]).parent / 'configs.yaml').read())
+  configs = yaml.YAML(typ='safe').load(
+      (embodied.Path(sys.argv[0]).parent / 'configs.yaml').read())
 
   def __init__(self, obs_space, act_space, step, config):
     self.config = config
@@ -23,20 +24,23 @@ class Agent(tfagent.TFAgent):
     self.act_space = act_space['action']
     self.step = step
     self.wm = WorldModel(obs_space, config)
-    self.task_behavior = getattr(behaviors, config.task_behavior)(
-        self.wm, self.act_space, self.config)
+    self.task_behavior = getattr(behaviors,
+                                 config.task_behavior)(self.wm, self.act_space,
+                                                       self.config)
     if config.expl_behavior == 'None':
       self.expl_behavior = self.task_behavior
     else:
-      self.expl_behavior = getattr(behaviors, config.expl_behavior)(
-          self.wm, self.act_space, self.config)
-    self.initial_policy_state = tf.function(lambda obs: (
-        self.wm.rssm.initial(len(obs['is_first'])),
-        self.task_behavior.initial(len(obs['is_first'])),
-        self.expl_behavior.initial(len(obs['is_first'])),
-        tf.zeros((len(obs['is_first']),) + self.act_space.shape)))
-    self.initial_train_state = tf.function(lambda obs: (
-        self.wm.rssm.initial(len(obs['is_first']))))
+      self.expl_behavior = getattr(behaviors,
+                                   config.expl_behavior)(self.wm,
+                                                         self.act_space,
+                                                         self.config)
+    self.initial_policy_state = tf.function(
+        lambda obs: (self.wm.rssm.initial(len(obs['is_first'])),
+                     self.task_behavior.initial(len(obs['is_first'])),
+                     self.expl_behavior.initial(len(obs['is_first'])),
+                     tf.zeros((len(obs['is_first']),) + self.act_space.shape)))
+    self.initial_train_state = tf.function(
+        lambda obs: (self.wm.rssm.initial(len(obs['is_first']))))
 
   @tf.function
   def policy(self, obs, state=None, mode='train'):
@@ -58,8 +62,10 @@ class Agent(tfagent.TFAgent):
     elif mode == 'train':
       outs, task_state = self.task_behavior.policy(latent, task_state)
       outs = {**outs, 'action': outs['action'].sample()}
-    outs = {**outs, 'action': tfutils.action_noise(
-        outs['action'], noise, self.act_space)}
+    outs = {
+        **outs, 'action':
+            tfutils.action_noise(outs['action'], noise, self.act_space)
+    }
     state = (latent, task_state, expl_state, outs['action'])
     return outs, state
 
@@ -73,8 +79,8 @@ class Agent(tfagent.TFAgent):
     state, wm_outs, mets = self.wm.train(data, state)
     metrics.update(mets)
     context = {**data, **wm_outs['post']}
-    start = tf.nest.map_structure(
-        lambda x: x.reshape([-1] + list(x.shape[2:])), context)
+    start = tf.nest.map_structure(lambda x: x.reshape([-1] + list(x.shape[2:])),
+                                  context)
     _, mets = self.task_behavior.train(self.wm.imagine, start, context)
     metrics.update(mets)
     if self.config.expl_behavior != 'None':
@@ -89,9 +95,16 @@ class Agent(tfagent.TFAgent):
   @tf.function
   def report(self, data):
     self.config.tf.jit and print('Tracing report function.')
+    print(f"Preprocessing data: {type(data)}", end='\t')
+    preprocess_time = time.time()
     data = self.preprocess(data)
+    preprocess_end = time.time()
+    print(f"Took {preprocess_end - preprocess_time} seconds.")
     report = {}
+    print(f"Reporting world moels.", end='\t')
     report.update(self.wm.report(data))
+    wm_report_end = time.time()
+    print(f"Took {wm_report_end - preprocess_end} seconds.")
     mets = self.task_behavior.report(data)
     report.update({f'task_{k}': v for k, v in mets.items()})
     if self.expl_behavior is not self.task_behavior:
@@ -108,9 +121,9 @@ class Agent(tfagent.TFAgent):
           lambda _: tf.data.Dataset.from_generator(generator, dtypes, shapes),
       ).batch(self.config.batch_size).prefetch(tf.data.AUTOTUNE)
     elif self.config.data_loader == 'embodied':
-      return embodied.Prefetch(
-          sources=[generator] * self.config.batch_size,
-          workers=8, prefetch=4)
+      return embodied.Prefetch(sources=[generator] * self.config.batch_size,
+                               workers=8,
+                               prefetch=4)
     else:
       raise NotImplementedError(self.config.data_loader)
 
@@ -127,8 +140,10 @@ class Agent(tfagent.TFAgent):
         value = value.astype(tf.float32)
       obs[key] = value
     obs['reward'] = {
-        'off': tf.identity, 'sign': tf.sign,
-        'tanh': tf.tanh, 'symlog': tfutils.symlog,
+        'off': tf.identity,
+        'sign': tf.sign,
+        'tanh': tf.tanh,
+        'symlog': tfutils.symlog,
     }[self.config.transform_rewards](obs['reward'])
     obs['cont'] = 1.0 - obs['is_terminal'].astype(tf.float32)
     return obs
@@ -139,6 +154,8 @@ class WorldModel(tfutils.Module):
   def __init__(self, obs_space, config):
     shapes = {k: tuple(v.shape) for k, v in obs_space.items()}
     shapes = {k: v for k, v in shapes.items() if not k.startswith('log_')}
+    print(f"World Model shapes: {shapes}")
+    print(f"Configs Encoder: {config.encoder}")
     self.config = config
     self.rssm = nets.RSSM(**config.rssm)
     self.encoder = nets.MultiEncoder(shapes, **config.encoder)
@@ -151,8 +168,9 @@ class WorldModel(tfutils.Module):
 
   def train(self, data, state=None):
     with tf.GradientTape() as model_tape:
-      model_loss, state, outputs, metrics = self.loss(
-          data, state, training=True)
+      model_loss, state, outputs, metrics = self.loss(data,
+                                                      state,
+                                                      training=True)
     modules = [self.encoder, self.rssm, *self.heads.values()]
     metrics.update(self.model_opt(model_tape, model_loss, modules))
     return state, outputs, metrics
@@ -160,8 +178,8 @@ class WorldModel(tfutils.Module):
   def loss(self, data, state=None, training=False):
     metrics = {}
     embed = self.encoder(data)
-    post, prior = self.rssm.observe(
-        embed, data['action'], data['is_first'], state)
+    post, prior = self.rssm.observe(embed, data['action'], data['is_first'],
+                                    state)
     dists = {}
     post_const = tf.nest.map_structure(tf.stop_gradient, post)
     for name, head in self.heads.items():
@@ -184,11 +202,11 @@ class WorldModel(tfutils.Module):
       scaled[key] = loss * self.config.loss_scales.get(key, 1.0)
     model_loss = sum(scaled.values())
     if 'prob' in data and self.config.priority_correct:
-      weights = (1.0 / data['prob']) ** self.config.priority_correct
+      weights = (1.0 / data['prob'])**self.config.priority_correct
       weights /= weights.max()
       assert weights.shape == model_loss.shape
       model_loss *= weights
-    out = {'embed':  embed, 'post': post, 'prior': prior}
+    out = {'embed': embed, 'post': post, 'prior': prior}
     out.update({f'{k}_loss': v for k, v in losses.items()})
     metrics['prior_ent'] = self.rssm.get_dist(prior).entropy().mean()
     metrics['post_ent'] = self.rssm.get_dist(post).entropy().mean()
@@ -209,17 +227,18 @@ class WorldModel(tfutils.Module):
     keys = list(self.rssm.initial(1).keys())
     start = {k: v for k, v in start.items() if k in keys}
     start['action'] = policy(start)
+
     def step(prev, _):
       prev = prev.copy()
       action = prev.pop('action')
       state = self.rssm.img_step(prev, action)
       action = policy(state)
       return {**state, 'action': action}
-    traj = tfutils.scan(
-        step, tf.range(horizon), start, self.config.imag_unroll)
+
+    traj = tfutils.scan(step, tf.range(horizon), start, self.config.imag_unroll)
     traj = {k: tf.concat([start[k][None], v], 0) for k, v in traj.items()}
-    traj['cont'] = tf.concat([
-        first_cont[None], self.heads['cont'](traj).mean()[1:]], 0)
+    traj['cont'] = tf.concat(
+        [first_cont[None], self.heads['cont'](traj).mean()[1:]], 0)
     traj['weight'] = tf.math.cumprod(
         self.config.discount * traj['cont']) / self.config.discount
     return traj
@@ -244,7 +263,10 @@ class WorldModel(tfutils.Module):
         action = action.sample()
       actions.append(action)
       carries.append(carry)
-    transp = lambda x: {k: [x[t][k] for t in range(len(x))] for k in x[0]}
+
+    def transp(x):
+      return {k: [x[t][k] for t in range(len(x))] for k in x[0]}
+
     traj = {**transp(states), **transp(carries), 'action': actions}
     traj = {k: tf.stack(v, 0) for k, v in traj.items()}
     cont = self.heads['cont'](traj).mean()
@@ -262,8 +284,8 @@ class WorldModel(tfutils.Module):
         data['is_first'][:6, :5])
     start = {k: v[:, -1] for k, v in context.items()}
     recon = self.heads['decoder'](context)
-    openl = self.heads['decoder'](
-        self.rssm.imagine(data['action'][:6, 5:], start))
+    openl = self.heads['decoder'](self.rssm.imagine(data['action'][:6, 5:],
+                                                    start))
     for key in self.heads['decoder'].cnn_shapes.keys():
       truth = data[key][:6].astype(tf.float32)
       model = tf.concat([recon[key].mode()[:, :5], openl[key].mode()], 1)
@@ -283,21 +305,22 @@ class ImagActorCritic(tfutils.Module):
     self.scales = scales
     self.act_space = act_space
     self.config = config
-    self.actor = nets.MLP(act_space.shape, **self.config.actor, dist=(
-        config.actor_dist_disc if act_space.discrete
-        else config.actor_dist_cont))
-    self.grad = (
-        config.actor_grad_disc if act_space.discrete
-        else config.actor_grad_cont)
+    self.actor = nets.MLP(act_space.shape,
+                          **self.config.actor,
+                          dist=(config.actor_dist_disc if act_space.discrete
+                                else config.actor_dist_cont))
+    self.grad = (config.actor_grad_disc
+                 if act_space.discrete else config.actor_grad_cont)
     self.advnorm = tfutils.Normalize(**self.config.advnorm)
     self.retnorms = {
-        k: tfutils.Normalize(**self.config.retnorm) for k in self.critics}
+        k: tfutils.Normalize(**self.config.retnorm) for k in self.critics
+    }
     self.scorenorms = {
-        k: tfutils.Normalize(**self.config.scorenorm) for k in self.critics}
+        k: tfutils.Normalize(**self.config.scorenorm) for k in self.critics
+    }
     if self.config.actent_perdim:
       shape = act_space.shape[:-1] if act_space.discrete else act_space.shape
-      self.actent = tfutils.AutoAdapt(
-          shape, **self.config.actent, inverse=True)
+      self.actent = tfutils.AutoAdapt(shape, **self.config.actent, inverse=True)
     else:
       self.actent = tfutils.AutoAdapt((), **self.config.actent, inverse=True)
     self.opt = tfutils.Optimizer('actor', **self.config.actor_opt)
@@ -309,8 +332,10 @@ class ImagActorCritic(tfutils.Module):
     return {'action': self.actor(state)}, carry
 
   def train(self, imagine, start, context):
-    policy = lambda s: self.actor(tf.nest.map_structure(
-        tf.stop_gradient, s)).sample()
+
+    def policy(s):
+      return self.actor(tf.nest.map_structure(tf.stop_gradient, s)).sample()
+
     with tf.GradientTape(persistent=True) as tape:
       traj = imagine(policy, start, self.config.imag_horizon)
     metrics = self.update(traj, tape)
@@ -352,9 +377,8 @@ class ImagActorCritic(tfutils.Module):
     else:
       raise NotImplementedError(self.grad)
 
-    shape = (
-        self.act_space.shape[:-1] if self.act_space.discrete
-        else self.act_space.shape)
+    shape = (self.act_space.shape[:-1]
+             if self.act_space.discrete else self.act_space.shape)
     if self.config.actent_perdim and len(shape) > 0:
       assert isinstance(policy, tfd.Independent), type(policy)
       ent = policy.distribution.entropy()[:-1]
@@ -396,8 +420,8 @@ class VFunction(tfutils.Module):
   def train(self, traj, actor):
     metrics = {}
     reward = self.rewfn(traj)
-    target = tf.stop_gradient(self.target(
-        traj, reward, self.config.critic_return)[0])
+    target = tf.stop_gradient(
+        self.target(traj, reward, self.config.critic_return)[0])
     with tf.GradientTape() as tape:
       dist = self.net({k: v[:-1] for k, v in traj.items()})
       loss = -(dist.log_prob(target) * traj['weight'][:-1]).mean()
@@ -431,7 +455,8 @@ class VFunction(tfutils.Module):
       return adv + value[:-1], value[:-1]
     elif impl == 'gve':
       vals = [value[-1]]
-      interm = reward + disc * value[1:] * (1 - self.config.return_lambda)
+      interm = reward + disc * value[1:] * \
+          (1 - self.config.return_lambda)
       for t in reversed(range(len(disc))):
         vals.append(interm[t] + disc[t] * self.config.return_lambda * vals[-1])
       ret = tf.stack(list(reversed(vals))[:-1])
@@ -502,7 +527,8 @@ class QFunction(tfutils.Module):
     value = self.target_net({**traj, 'action': action}).mean()
     if self.config.pengs_qlambda:
       vals = [value[-1]]
-      interm = reward + disc * value[1:] * (1 - self.config.return_lambda)
+      interm = reward + disc * value[1:] * \
+          (1 - self.config.return_lambda)
       for t in reversed(range(len(disc))):
         vals.append(interm[t] + disc[t] * self.config.return_lambda * vals[-1])
       tar = tf.stack(list(reversed(vals))[:-1])
@@ -545,9 +571,8 @@ class TwinQFunction(tfutils.Module):
   def score(self, traj, actor):
     traj = tf.nest.map_structure(tf.stop_gradient, traj)
     inps = {**traj, 'action': actor(traj).sample()}
-    ret = tf.math.reduce_min([
-        self.net1(inps).mode(),
-        self.net2(inps).mode()], 0)[:-1]
+    ret = tf.math.reduce_min(
+        [self.net1(inps).mode(), self.net2(inps).mode()], 0)[:-1]
     baseline = tf.zeros_like(ret)
     return ret, baseline
 
@@ -580,11 +605,17 @@ class TwinQFunction(tfutils.Module):
     cont = traj['cont'][1:]
     disc = cont * self.config.discount
     value = tf.math.reduce_min([
-        self.target_net1({**traj, 'action': actor(traj).sample()}).mean(),
-        self.target_net2({**traj, 'action': actor(traj).sample()}).mean()], 0)
+        self.target_net1({
+            **traj, 'action': actor(traj).sample()
+        }).mean(),
+        self.target_net2({
+            **traj, 'action': actor(traj).sample()
+        }).mean()
+    ], 0)
     if self.config.pengs_qlambda:
       vals = [value[-1]]
-      interm = reward + disc * value[1:] * (1 - self.config.return_lambda)
+      interm = reward + disc * value[1:] * \
+          (1 - self.config.return_lambda)
       for t in reversed(range(len(disc))):
         vals.append(interm[t] + disc[t] * self.config.return_lambda * vals[-1])
       tar = tf.stack(list(reversed(vals))[:-1])
