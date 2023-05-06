@@ -95,7 +95,6 @@ class Agent(tfagent.TFAgent):
   @tf.function
   def report(self, data):
     self.config.tf.jit and print('Tracing report function.')
-    print(f"Preprocessing data: {type(data)}", end='\t')
     preprocess_time = time.time()
     data = self.preprocess(data)
     preprocess_end = time.time()

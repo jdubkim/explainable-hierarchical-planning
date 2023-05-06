@@ -10,7 +10,7 @@ class MiniGrid(embodied.Env):
 
   def __init__(self, task, obs_key='image', act_key='action'):
     assert task in ('doorkey_flat', 'doorkey_vision')
-    self._env = gym.make('MiniGrid-FourRooms-v0')
+    self._env = gym.make('MiniGrid-Empty-5x5-v0')
     self._obs_dict = isinstance(self._env.observation_space.spaces, dict)
     self._act_dict = isinstance(self._env.action_space, dict)
     self._obs_key = obs_key

@@ -51,6 +51,7 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
         metrics[f'policy_{key}'] = ep[key]
         if 'log_goal' in ep:
           if ep['image'].shape == ep['log_goal'].shape:
+            print("ep['log_goal'] shape: ", ep['log_goal'].shape)
             goal = (255 * ep['log_goal']).astype(np.uint8)
             metrics[f'policy_{key}_with_goal'] = np.concatenate(
                 [ep['image'], goal], 2)

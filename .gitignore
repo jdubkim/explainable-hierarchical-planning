@@ -4,3 +4,4 @@ __pycache__/
 dist
 MUJOCO_LOG.TXT
 slurm_outputs/*
+outputs/*

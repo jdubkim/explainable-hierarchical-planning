@@ -17,7 +17,7 @@ defaults:
   filter: '.*'
   tbtt: 0
   train:
-    steps: 1e8
+    steps: 1e6
     expl_until: 0
     log_every: 1e4
     eval_every: 3e4
@@ -178,21 +178,23 @@ dmc_proprio:
   env.repeat: 1
 
 minigrid_vision:
-
+  env: {size: [7, 7]}
+  replay_size: 1e5
   task: minigrid_doorkey_vision
-  rssm: {units: 128, deter: 128, stoch: 8, classes: 8}
-  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 128, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 128, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  reward_head: {layers: 1, units: 128}
-  cont_head: {layers: 1, units: 128}
-  actor: {layers: 1, units: 128}
-  critic: {layers: 1, units: 128}
-  goal_encoder: {layers: 1, units: 128}
-  goal_decoder: {layers: 1, units: 128}
-  disag_head: {layers: 1, units: 128}
-  ctrl_embed: {layers: 1, units: 128}
-  expl_enc: {layers: 1, units: 128}
-  expl_dec: {layers: 1, units: 128}
+  rssm: {units: 256, deter: 256, stoch: 16, classes: 16}
+  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  reward_head: {layers: 1, units: 256}
+  cont_head: {layers: 1, units: 256}
+  actor: {layers: 1, units: 256}
+  critic: {layers: 1, units: 256}
+  goal_encoder: {layers: 1, units: 256}
+  goal_decoder: {layers: 1, units: 256}
+  disag_head: {layers: 1, units: 256}
+  ctrl_embed: {layers: 1, units: 256}
+  expl_enc: {layers: 1, units: 256}
+  expl_dec: {layers: 1, units: 256}
+  .*\.lr: 1e-3
   env.repeat: 1
 
 minigrid_flat:

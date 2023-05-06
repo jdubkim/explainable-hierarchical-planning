@@ -352,7 +352,6 @@ class ImageDecoderSimple(tfutils.Module):
     x = self.get('out', ConvT, self._shape[-1], self._kernels[-1],
                  self._strides[-1])(x)
     x = tf.math.sigmoid(x)
-    print(f"x.shape: {x.shape}, original shape: {self._shape}")
     assert x.shape[-3:] == self._shape, (x.shape, self._shape)
     return x
 
