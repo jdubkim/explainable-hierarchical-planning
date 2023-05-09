@@ -18,7 +18,7 @@ class Agent(tfagent.TFAgent):
   configs = yaml.YAML(typ='safe').load(
       (embodied.Path(sys.argv[0]).parent / 'configs.yaml').read())
 
-  def __init__(self, obs_space, act_space, step, config):
+  def __init__(self, obs_space, act_space, step, config, render_func=None):
     self.config = config
     self.obs_space = obs_space
     self.act_space = act_space['action']
@@ -26,14 +26,14 @@ class Agent(tfagent.TFAgent):
     self.wm = WorldModel(obs_space, config)
     self.task_behavior = getattr(behaviors,
                                  config.task_behavior)(self.wm, self.act_space,
-                                                       self.config)
+                                                       self.config, render_func)
     if config.expl_behavior == 'None':
       self.expl_behavior = self.task_behavior
     else:
       self.expl_behavior = getattr(behaviors,
                                    config.expl_behavior)(self.wm,
                                                          self.act_space,
-                                                         self.config)
+                                                         self.config, render_func)
     self.initial_policy_state = tf.function(
         lambda obs: (self.wm.rssm.initial(len(obs['is_first'])),
                      self.task_behavior.initial(len(obs['is_first'])),

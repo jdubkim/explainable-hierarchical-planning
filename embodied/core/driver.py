@@ -49,6 +49,7 @@ class Driver:
     """
     # Gets the next action and the next state from policy.
     acts, self._state = policy(self._obs, self._state, **self._kwargs)
+        
     # Initialize the reset action.
     acts['reset'] = np.zeros(len(self._env), bool)
     # If the episode is over, reset the environment.
@@ -79,10 +80,7 @@ class Driver:
       [self._eps[i][k].append(v) for k, v in trn.items()]
       # Call the step callback with the transition, the environment index and the
       # keyword arguments.
-      for fn in self._on_steps:
-        fn(trn, i, **self._kwargs)
-
-      # [fn(trn, i, **self._kwargs) for fn in self._on_steps]
+      [fn(trn, i, **self._kwargs) for fn in self._on_steps]
       step += 1
 
     # If the episode is over, call the episode callback with the episode buffer,
@@ -92,9 +90,7 @@ class Driver:
         if not done:
           continue
         ep = {k: convert(v) for k, v in self._eps[i].items()}
-        # [fn(ep.copy(), i, **self._kwargs) for fn in self._on_episodes]
-        for fn in self._on_episodes:
-          fn(ep.copy(), i, **self._kwargs)
+        [fn(ep.copy(), i, **self._kwargs) for fn in self._on_episodes]
         episode += 1
     # Return the number of steps and episodes performed.
     return step, episode

@@ -10,7 +10,7 @@ from .hierarchy import Hierarchy  # noqa
 
 class Greedy(tfutils.Module):
 
-  def __init__(self, wm, act_space, config):
+  def __init__(self, wm, act_space, config, render_func=None):
     rewfn = lambda s: wm.heads['reward'](s).mean()[1:]
     if config.critic_type == 'vfunction':
       critics = {'extr': agent.VFunction(rewfn, config)}
@@ -33,7 +33,7 @@ class Greedy(tfutils.Module):
 
 class Random(tfutils.Module):
 
-  def __init__(self, wm, act_space, config):
+  def __init__(self, wm, act_space, config, render_func=None):
     self.config = config
     self.act_space = act_space
 
@@ -66,7 +66,7 @@ class Explore(tfutils.Module):
       'pbe': expl.PBE,
   }
 
-  def __init__(self, wm, act_space, config):
+  def __init__(self, wm, act_space, config, render_func=None):
     self.config = config
     self.rewards = {}
     critics = {}

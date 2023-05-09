@@ -267,8 +267,6 @@ class MultiDecoder(tfutils.Module):
         k: v for k, v in shapes.items() if re.match(mlp_keys, k) and len(v) == 1
     }
     self.shapes = {**self.cnn_shapes, **self.mlp_shapes}
-    print('Decoder CNN shapes:', self.cnn_shapes)
-    print('Decoder MLP shapes:', self.mlp_shapes)
     if self.cnn_shapes:
       shapes = list(self.cnn_shapes.values())
       assert all(x[:-1] == shapes[0][:-1] for x in shapes)

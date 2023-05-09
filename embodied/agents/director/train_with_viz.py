@@ -49,12 +49,19 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
         if key == 'none':
           continue
         metrics[f'policy_{key}'] = ep[key]
-        if 'log_goal' in ep:
-          if ep['image'].shape == ep['log_goal'].shape:
-            print("ep['log_goal'] shape: ", ep['log_goal'].shape)
-            goal = (255 * ep['log_goal']).astype(np.uint8)
+        if 'log_goal_render' in ep:
+          # if ep['image'].shape == ep['log_goal'].shape:
+          #   goal = (255 * ep['log_goal']).astype(np.uint8)
+          #   metrics[f'policy_image_with_goal'] = np.concatenate(
+          #       [ep['image'], goal], 2)
+          if ep[key].shape == ep['log_goal_render'].shape:
             metrics[f'policy_{key}_with_goal'] = np.concatenate(
-                [ep['image'], goal], 2)
+                [ep[key], ep['log_goal_render']], 2)
+            print("Rendering Images Matching.")
+          else:
+            print("Rendering Images Not matching")
+          print(ep[key].shape)
+          print(ep['log_goal_render'].shape)
     logger.add(metrics, prefix='episode')
     logger.add(logs, prefix='logs')
     logger.add(train_replay.stats, prefix='replay')

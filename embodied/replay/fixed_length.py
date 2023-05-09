@@ -10,7 +10,7 @@ import embodied
 class FixedLength(embodied.Replay):
 
   def __init__(
-      self, store, chunk=64, length=0, prio_starts=0.0, prio_ends=1.0, sync=0):
+      self, store, chunk=8, length=0, prio_starts=0.0, prio_ends=1.0, sync=0):
     self.store = store
     self.chunk = chunk
     self.length = length

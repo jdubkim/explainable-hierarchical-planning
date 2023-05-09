@@ -196,6 +196,10 @@ minigrid_vision:
   expl_dec: {layers: 1, units: 256}
   .*\.lr: 1e-3
   env.repeat: 1
+  replay_chunk: 8
+  train:
+    eval_every: 300
+    log_keys_video: [render]
 
 minigrid_flat:
 

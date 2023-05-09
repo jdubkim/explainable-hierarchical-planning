@@ -12,7 +12,7 @@ from . import prios
 class Prioritized(embodied.Replay):
 
   def __init__(
-      self, store, chunk=64, prio_starts=0.0, prio_ends=1.0, sync=0,
+      self, store, chunk=8, prio_starts=0.0, prio_ends=1.0, sync=0,
       fraction=0.1, softmax=False, temp=1.0, constant=0.0, exponent=0.5):
     # TODO: We're currently not removing old episodes from the priority table
     # when the store is reaching its capacity.

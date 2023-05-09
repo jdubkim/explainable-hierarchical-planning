@@ -17,6 +17,7 @@ class MiniGrid(embodied.Env):
     self._act_key = act_key
     self._done = True
     self._info = None
+    self._render_shape = self._env.render('rgb_array').shape
 
   @property
   def info(self):
@@ -37,6 +38,7 @@ class MiniGrid(embodied.Env):
         'is_first': embodied.Space(bool),
         'is_last': embodied.Space(bool),
         'is_terminal': embodied.Space(bool),
+        'render': embodied.Space(np.uint8, self._render_shape),
     }
 
   @functools.cached_property
@@ -76,7 +78,8 @@ class MiniGrid(embodied.Env):
     obs.update(reward=np.float32(reward),
                is_first=is_first,
                is_last=is_last,
-               is_terminal=is_terminal)
+               is_terminal=is_terminal,
+               render=self.render_from_obs(obs))
     return obs
 
   def render(self):
@@ -122,3 +125,9 @@ class MiniGrid(embodied.Env):
     if hasattr(space, 'n'):
       return embodied.Space(np.int32, (), 0, space.n)
     return embodied.Space(space.dtype, space.shape, space.low, space.high)
+
+  def render_from_obs(self, obs):
+    if self._obs_dict:
+      obs = obs[self._obs_key]
+    
+    return self._env.get_obs_render(obs)

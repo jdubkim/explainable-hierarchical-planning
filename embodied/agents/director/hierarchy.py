@@ -13,7 +13,7 @@ from . import tfutils
 
 class Hierarchy(tfutils.Module):
 
-  def __init__(self, wm, act_space, config):
+  def __init__(self, wm, act_space, config, render_func=None):
     self.wm = wm
     self.config = config
     self.extr_reward = lambda traj: self.wm.heads['reward'](traj).mean()[1:]
@@ -69,6 +69,9 @@ class Hierarchy(tfutils.Module):
     self.kl = tfutils.AutoAdapt((), **self.config.encdec_kl)
     self.opt = tfutils.Optimizer('goal', **config.encdec_opt)
 
+    # Render goal if specified. 
+    self.render_func = render_func
+
   def initial(self, batch_size):
     return {
         'step': tf.zeros((batch_size,), tf.int64),
@@ -97,6 +100,10 @@ class Hierarchy(tfutils.Module):
       outs['log_goal'] = self.wm.heads['decoder']({
           'deter': goal, 'stoch': self.wm.rssm.get_stoch(goal),
       })['image'].mode()
+    if self.render_func is not None:
+      print("Rendering log goal.", outs['log_goal_render'].shape)
+      outs['log_goal_render'] = self.render_func(outs['log_goal'])
+
     carry = {'step': carry['step'] + 1, 'skill': skill, 'goal': goal}
     return outs, carry
 

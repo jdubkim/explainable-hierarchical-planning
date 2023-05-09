@@ -93,6 +93,10 @@ def main(argv=None):
                                  mode='train',
                                  logdir=logdir,
                                  **config.env)
+    if 'minigrid' in config.task:
+      # Retrieve rendering function
+      render_func = env._envs[0].render_from_obs
+
     agent = agnt.Agent(env.obs_space, env.act_space, step, config)
     print(f"Run Type: {config.run}")
     if config.run == 'train':
