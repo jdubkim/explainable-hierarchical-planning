@@ -2,7 +2,7 @@ class Agent:
 
   configs = {}  # dict of dicts
 
-  def __init__(self, obs_space, act_space, step, config):
+  def __init__(self, obs_space, act_space, step, config, render_func=None):
     pass
 
   def dataset(self, generator_fn):
