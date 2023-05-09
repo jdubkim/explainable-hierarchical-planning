@@ -25,32 +25,37 @@ class Hierarchy(tfutils.Module):
         'actor.inputs': self.config.worker_inputs,
         'critic.inputs': self.config.worker_inputs,
     })
-    self.worker = agent.ImagActorCritic({
-        'extr': agent.VFunction(lambda s: s['reward_extr'], wconfig),
-        'expl': agent.VFunction(lambda s: s['reward_expl'], wconfig),
-        'goal': agent.VFunction(lambda s: s['reward_goal'], wconfig),
-    }, config.worker_rews, act_space, wconfig)
+    self.worker = agent.ImagActorCritic(
+        {
+            'extr': agent.VFunction(lambda s: s['reward_extr'], wconfig),
+            'expl': agent.VFunction(lambda s: s['reward_expl'], wconfig),
+            'goal': agent.VFunction(lambda s: s['reward_goal'], wconfig),
+        }, config.worker_rews, act_space, wconfig)
 
     mconfig = config.update({
         'actor_grad_cont': 'reinforce',
         'actent.target': config.manager_actent,
     })
-    self.manager = agent.ImagActorCritic({
-        'extr': agent.VFunction(lambda s: s['reward_extr'], mconfig),
-        'expl': agent.VFunction(lambda s: s['reward_expl'], mconfig),
-        'goal': agent.VFunction(lambda s: s['reward_goal'], mconfig),
-    }, config.manager_rews, self.skill_space, mconfig)
+    self.manager = agent.ImagActorCritic(
+        {
+            'extr': agent.VFunction(lambda s: s['reward_extr'], mconfig),
+            'expl': agent.VFunction(lambda s: s['reward_expl'], mconfig),
+            'goal': agent.VFunction(lambda s: s['reward_goal'], mconfig),
+        }, config.manager_rews, self.skill_space, mconfig)
 
     if self.config.expl_rew == 'disag':
       self.expl_reward = expl.Disag(wm, act_space, config)
     elif self.config.expl_rew == 'adver':
       self.expl_reward = self.elbo_reward
+    elif self.config.expl_rew == 'adver_reg':
+      self.expl_reward = self.elbo_reward_regularised
     else:
       raise NotImplementedError(self.config.expl_rew)
     if config.explorer:
-      self.explorer = agent.ImagActorCritic({
-          'expl': agent.VFunction(self.expl_reward, config),
-      }, {'expl': 1.0}, act_space, config)
+      self.explorer = agent.ImagActorCritic(
+          {
+              'expl': agent.VFunction(self.expl_reward, config),
+          }, {'expl': 1.0}, act_space, config)
 
     shape = self.skill_space.shape
     if self.skill_space.discrete:
@@ -62,14 +67,16 @@ class Hierarchy(tfutils.Module):
 
     self.feat = nets.Input(['deter'])
     self.goal_shape = (self.config.rssm.deter,)
-    self.enc = nets.MLP(
-        config.skill_shape, dims='context', **config.goal_encoder)
-    self.dec = nets.MLP(
-        self.goal_shape, dims='context', **self.config.goal_decoder)
+    self.enc = nets.MLP(config.skill_shape,
+                        dims='context',
+                        **config.goal_encoder)
+    self.dec = nets.MLP(self.goal_shape,
+                        dims='context',
+                        **self.config.goal_decoder)
     self.kl = tfutils.AutoAdapt((), **self.config.encdec_kl)
     self.opt = tfutils.Optimizer('goal', **config.encdec_opt)
 
-    # Render goal if specified. 
+    # Render goal if specified.
     self.render_func = render_func
 
   def initial(self, batch_size):
@@ -84,21 +91,20 @@ class Hierarchy(tfutils.Module):
         self.config.env_skill_duration)
     sg = lambda x: tf.nest.map_structure(tf.stop_gradient, x)
     update = (carry['step'] % duration) == 0
-    switch = lambda x, y: (
-        tf.einsum('i,i...->i...', 1 - update.astype(x.dtype), x) +
-        tf.einsum('i,i...->i...', update.astype(x.dtype), y))
+    switch = lambda x, y: (tf.einsum('i,i...->i...', 1 - update.astype(
+        x.dtype), x) + tf.einsum('i,i...->i...', update.astype(x.dtype), y))
     skill = sg(switch(carry['skill'], self.manager.actor(sg(latent)).sample()))
     new_goal = self.dec({'skill': skill, 'context': self.feat(latent)}).mode()
-    new_goal = (
-        self.feat(latent).astype(tf.float32) + new_goal
-        if self.config.manager_delta else new_goal)
+    new_goal = (self.feat(latent).astype(tf.float32) +
+                new_goal if self.config.manager_delta else new_goal)
     goal = sg(switch(carry['goal'], new_goal))
     delta = goal - self.feat(latent).astype(tf.float32)
     dist = self.worker.actor(sg({**latent, 'goal': goal, 'delta': delta}))
     outs = {'action': dist}
     if 'image' in self.wm.heads['decoder'].shapes:
       outs['log_goal'] = self.wm.heads['decoder']({
-          'deter': goal, 'stoch': self.wm.rssm.get_stoch(goal),
+          'deter': goal,
+          'stoch': self.wm.rssm.get_stoch(goal),
       })['image'].mode()
     if self.render_func is not None:
       print("Rendering log goal.", outs['log_goal_render'].shape)
@@ -153,9 +159,8 @@ class Hierarchy(tfutils.Module):
     metrics = {}
     with tf.GradientTape(persistent=True) as tape:
       policy = functools.partial(self.policy, imag=True)
-      traj = self.wm.imagine_carry(
-          policy, start, self.config.imag_horizon,
-          self.initial(len(start['is_first'])))
+      traj = self.wm.imagine_carry(policy, start, self.config.imag_horizon,
+                                   self.initial(len(start['is_first'])))
       traj['reward_extr'] = self.extr_reward(traj)
       traj['reward_expl'] = self.expl_reward(traj)
       traj['reward_goal'] = self.goal_reward(traj)
@@ -176,11 +181,13 @@ class Hierarchy(tfutils.Module):
     with tf.GradientTape(persistent=True) as tape:
       skill = self.manager.actor(sg(start)).sample()
       goal = self.dec({'skill': skill, 'context': context}).mode()
-      goal = (
-          self.feat(start).astype(tf.float32) + goal
-          if self.config.manager_delta else goal)
-      worker = lambda s: self.worker.actor(sg({
-          **s, 'goal': goal, 'delta': goal - self.feat(s)})).sample()
+      goal = (self.feat(start).astype(tf.float32) +
+              goal if self.config.manager_delta else goal)
+      worker = lambda s: self.worker.actor(
+          sg({
+              **s, 'goal': goal,
+              'delta': goal - self.feat(s)
+          })).sample()
       traj = imagine(worker, start, self.config.imag_horizon)
       traj['goal'] = tf.repeat(goal[None], 1 + self.config.imag_horizon, 0)
       traj['skill'] = tf.repeat(skill[None], 1 + self.config.imag_horizon, 0)
@@ -200,9 +207,8 @@ class Hierarchy(tfutils.Module):
     start = start.copy()
     with tf.GradientTape(persistent=True) as tape:
       policy = functools.partial(self.policy, imag=True)
-      traj = self.wm.imagine_carry(
-          policy, start, self.config.imag_horizon,
-          self.initial(len(start['is_first'])))
+      traj = self.wm.imagine_carry(policy, start, self.config.imag_horizon,
+                                   self.initial(len(start['is_first'])))
       traj['reward_extr'] = self.extr_reward(traj)
       traj['reward_expl'] = self.expl_reward(traj)
       traj['reward_goal'] = self.goal_reward(traj)
@@ -217,9 +223,12 @@ class Hierarchy(tfutils.Module):
     metrics = {}
     sg = lambda x: tf.nest.map_structure(tf.stop_gradient, x)
     with tf.GradientTape(persistent=True) as tape:
-      worker = lambda s: self.worker.actor(sg({
-          **s, 'goal': goal, 'delta': goal - self.feat(s).astype(tf.float32),
-      })).sample()
+      worker = lambda s: self.worker.actor(
+          sg({
+              **s,
+              'goal': goal,
+              'delta': goal - self.feat(s).astype(tf.float32),
+          })).sample()
       traj = imagine(worker, start, self.config.imag_horizon)
       traj['goal'] = tf.repeat(goal[None], 1 + self.config.imag_horizon, 0)
       traj['reward_extr'] = self.extr_reward(traj)
@@ -316,14 +325,13 @@ class Hierarchy(tfutils.Module):
     if self.config.goal_reward == 'dot':
       return tf.einsum('...i,...i->...', goal, feat)[1:]
     elif self.config.goal_reward == 'dir':
-      return tf.einsum(
-          '...i,...i->...', tf.nn.l2_normalize(goal, -1), feat)[1:]
+      return tf.einsum('...i,...i->...', tf.nn.l2_normalize(goal, -1), feat)[1:]
     elif self.config.goal_reward == 'normed_inner':
       norm = tf.linalg.norm(goal, axis=-1, keepdims=True)
       return tf.einsum('...i,...i->...', goal / norm, feat / norm)[1:]
     elif self.config.goal_reward == 'normed_squared':
       norm = tf.linalg.norm(goal, axis=-1, keepdims=True)
-      return -((goal / norm - feat / norm) ** 2).mean(-1)[1:]
+      return -((goal / norm - feat / norm)**2).mean(-1)[1:]
     elif self.config.goal_reward == 'cosine_lower':
       gnorm = tf.linalg.norm(goal, axis=-1, keepdims=True) + 1e-12
       fnorm = tf.linalg.norm(feat, axis=-1, keepdims=True) + 1e-12
@@ -377,7 +385,7 @@ class Hierarchy(tfutils.Module):
     elif self.config.goal_reward == 'norm':
       return -tf.linalg.norm(goal - feat, axis=-1)[1:]
     elif self.config.goal_reward == 'squared':
-      return -((goal - feat) ** 2).sum(-1)[1:]
+      return -((goal - feat)**2).sum(-1)[1:]
     elif self.config.goal_reward == 'epsilon':
       return ((goal - feat).mean(-1) < 1e-3).astype(tf.float32)[1:]
     elif self.config.goal_reward == 'enclogprob':
@@ -393,7 +401,7 @@ class Hierarchy(tfutils.Module):
       dist = self.enc({'goal': goal, 'context': context})
       probs = dist.distribution.probs_parameter()
       norm = tf.linalg.norm(probs, axis=[-2, -1], keepdims=True)
-      return -((probs / norm - skill / norm) ** 2).mean([-2, -1])[1:]
+      return -((probs / norm - skill / norm)**2).mean([-2, -1])[1:]
     else:
       raise NotImplementedError(self.config.goal_reward)
 
@@ -407,12 +415,34 @@ class Hierarchy(tfutils.Module):
     if self.config.adver_impl == 'abs':
       return tf.abs(dec.mode() - feat).mean(-1)[1:]
     elif self.config.adver_impl == 'squared':
-      return ((dec.mode() - feat) ** 2).mean(-1)[1:]
+      return ((dec.mode() - feat)**2).mean(-1)[1:]
     elif self.config.adver_impl == 'elbo_scaled':
       return (kl - ll / self.kl.scale())[1:]
     elif self.config.adver_impl == 'elbo_unscaled':
       return (kl - ll)[1:]
     raise NotImplementedError(self.config.adver_impl)
+
+  def elbo_reward_regularised(self, traj):
+    feat = self.feat(traj).astype(tf.float32)
+    context = tf.repeat(feat[0][None], 1 + self.config.imag_horizon, 0)
+    enc = self.enc({'goal': feat, 'context': context})
+    dec = self.dec({'skill': enc.sample(), 'context': context})
+    ll = dec.log_prob(feat)
+    kl = tfd.kl_divergence(enc, self.prior)
+    if self.config.adver_impl == 'abs':
+      rew = tf.abs(dec.mode() - feat).mean(-1)[1:]
+    elif self.config.adver_impl == 'squared':
+      rew = ((dec.mode() - feat)**2).mean(-1)[1:]
+    elif self.config.adver_impl == 'elbo_scaled':
+      rew = (kl - ll / self.kl.scale())[1:]
+    elif self.config.adver_impl == 'elbo_unscaled':
+      rew = (kl - ll)[1:]
+    raise NotImplementedError(self.config.adver_impl)
+
+    # Add regularisation term, critic value of decoded goal
+    reg = self.worker.critic({'goal': dec.mode(), 'context': context})[1:]
+    alpha = self.config.adver_reg  # Regularisation weight
+    return rew + alpha * reg
 
   def split_traj(self, traj):
     traj = traj.copy()
@@ -425,8 +455,7 @@ class Hierarchy(tfutils.Module):
       val = tf.concat([reshape(val[:-1]), val[k::k][:, None]], 1)
       # N val K val B val F... -> K val (N B) val F...
       val = val.transpose([1, 0] + list(range(2, len(val.shape))))
-      val = val.reshape(
-          [val.shape[0], np.prod(val.shape[1:3])] + val.shape[3:])
+      val = val.reshape([val.shape[0], np.prod(val.shape[1:3])] + val.shape[3:])
       val = val[1:] if 'reward' in key else val
       traj[key] = val
     # Bootstrap sub trajectory against current not next goal.
@@ -482,10 +511,11 @@ class Hierarchy(tfutils.Module):
     goal = self.propose_goal(start, impl)
     # Worker rollout.
     worker = lambda s: self.worker.actor({
-        **s, 'goal': goal, 'delta': goal - self.feat(s).astype(tf.float32),
+        **s,
+        'goal': goal,
+        'delta': goal - self.feat(s).astype(tf.float32),
     }).sample()
-    traj = self.wm.imagine(
-        worker, start, self.config.worker_report_horizon)
+    traj = self.wm.imagine(worker, start, self.config.worker_report_horizon)
     # Decoder into images.
     initial = decoder(start)
     target = decoder({'deter': goal, 'stoch': self.wm.rssm.get_stoch(goal)})

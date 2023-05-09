@@ -96,8 +96,10 @@ def main(argv=None):
     if 'minigrid' in config.task:
       # Retrieve rendering function
       render_func = env._envs[0].render_from_obs
+    else:
+      render_func = None
 
-    agent = agnt.Agent(env.obs_space, env.act_space, step, config)
+    agent = agnt.Agent(env.obs_space, env.act_space, step, config, render_func)
     print(f"Run Type: {config.run}")
     if config.run == 'train':
       replay = make_replay('episodes', config.replay_size)
