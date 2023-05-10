@@ -136,7 +136,6 @@ class MiniGrid(embodied.Env):
     def render_from_obs(self, obs):
         if isinstance(obs, dict):
             obs = obs[self._obs_key]
-        print("Obs shape: ", obs.shape)
         if len(obs.shape) == 3:
             return self._env.get_obs_render(obs)
 
