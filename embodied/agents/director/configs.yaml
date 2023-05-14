@@ -182,8 +182,8 @@ minigrid_vision:
   replay_size: 5e4
   task: minigrid_doorkey_vision
   rssm: {units: 256, deter: 256, stoch: 16, classes: 16}
-  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3], strides: [2, 1]}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3], strides: [2, 1]}
+  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
   reward_head: {layers: 2, units: 128}
   cont_head: {layers: 2, units: 128}
   actor: {layers: 2, units: 128}
