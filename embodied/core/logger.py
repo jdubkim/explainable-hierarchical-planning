@@ -146,7 +146,7 @@ class JSONLOutput(AsyncOutput):
 
 class TensorBoardOutput(AsyncOutput):
 
-  def __init__(self, logdir, fps=20, parallel=True):
+  def __init__(self, logdir, fps=5, parallel=True):
     super().__init__(self._write, parallel)
     self._logdir = str(logdir)
     if self._logdir.startswith('/gcs/'):

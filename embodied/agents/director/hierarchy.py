@@ -13,7 +13,6 @@ from . import tfutils
 
 class Hierarchy(tfutils.Module):
     def __init__(self, wm, act_space, config, render_func=None):
-        print("Hierarchy rendering: ", render_func)
         # Render goal if specified.
         self.render_func = render_func
         self.wm = wm

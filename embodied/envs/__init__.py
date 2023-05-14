@@ -76,9 +76,6 @@ def load_single_env(
     elif suite == 'minigrid':
         from . import minigrid
         env = minigrid.MiniGrid(task)
-        if task == 'doorkey_flat':
-            # Add a wrapper that flattens the image input to a vector.
-            env = embodied.wrappers.FlatObsWrapper(env)
     else:
         raise NotImplementedError(suite)
     for name, space in env.act_space.items():

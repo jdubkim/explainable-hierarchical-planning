@@ -66,6 +66,8 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
     logger.add(logs, prefix='logs')
     logger.add(train_replay.stats, prefix='replay')
     logger.write()
+    if should_video(step):
+      exit()
 
   fill = max(0, args.eval_fill - len(eval_replay))
   if fill:

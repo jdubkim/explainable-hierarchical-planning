@@ -30,18 +30,11 @@ class Agent(tfagent.TFAgent):
                                                            self.act_space,
                                                            self.config,
                                                            self.render_func)
-        print("Agent Configs")
-        print("Render Func: ", self.render_func)
-        print("Task behavior: ", self.task_behavior)
-        print("Task behavior.render_func: ", self.task_behavior.render_func)
         if config.expl_behavior == 'None':
             self.expl_behavior = self.task_behavior
         else:
             self.expl_behavior = getattr(behaviors, config.expl_behavior)(
                 self.wm, self.act_space, self.config, self.render_func)
-            print("Expl behavior: ", self.expl_behavior)
-            print("Expl behavior.render_func: ",
-                  self.expl_behavior.render_func)
         self.initial_policy_state = tf.function(lambda obs: (
             self.wm.rssm.initial(len(obs['is_first'])),
             self.task_behavior.initial(len(obs['is_first'])),

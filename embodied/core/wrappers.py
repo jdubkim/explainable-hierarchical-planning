@@ -19,7 +19,7 @@ class TimeLimit(base.Wrapper):
         self._done = False
 
     def step(self, action):
-        if action['reset'] or self._done:
+        if self._done:
             self._step = 0
             self._done = False
             if self._reset:
@@ -46,7 +46,7 @@ class ActionRepeat(base.Wrapper):
         self._done = False
 
     def step(self, action):
-        if action['reset'] or self._done:
+        if self._done:
             return self.env.step(action)
         reward = 0.0
         for _ in range(self._repeat):

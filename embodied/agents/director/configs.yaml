@@ -39,7 +39,7 @@ defaults:
   # Agent
   task_behavior: Hierarchy
   expl_behavior: None
-  batch_size: 16
+  batch_size: 64
   transform_rewards: off
   expl_noise: 0.0
   eval_noise: 0.0
@@ -96,11 +96,10 @@ defaults:
   train_skill_duration: 8
   skill_shape: [8, 8]
   manager_rews: {extr: 1.0, expl: 0.1, goal: 0.0}
-  worker_rews: {extr: 0.0, expl: 0.0, goal: 1.0}
+  worker_rews: {extr: 1.0, expl: 0.0, goal: 1.0}
   worker_inputs: [deter, stoch, goal]
   worker_report_horizon: 64
   skill_proposal: manager
-  goal_proposal: replay
   goal_reward: cosine_max
   goal_encoder: {layers: 4, units: 512, act: elu, norm: layer, dist: onehot, outscale: 0.1, unimix: 0.0, inputs: [goal]}
   goal_decoder: {layers: 4, units: 512, act: elu, norm: layer, dist: mse, outscale: 0.1, inputs: [skill]}
@@ -113,7 +112,7 @@ defaults:
   encdec_opt: {opt: adam, lr: 1e-4, eps: 1e-6, clip: 100.0, wd: 1e-2, wd_pattern: 'kernel'}
   explorer: False
   explorer_repeat: False
-  expl_rew: adver_reg
+  expl_rew: adver
   manager_dist: onehot
   manager_grad: reinforce
   manager_actent: 0.5
@@ -179,27 +178,28 @@ dmc_proprio:
   env.repeat: 1
 
 minigrid_vision:
-  env: {size: [7, 7]}
-  replay_size: 1e5
+  env: {size: [7, 7], amount: 4, length: 200}
+  replay_size: 5e4
   task: minigrid_doorkey_vision
   rssm: {units: 256, deter: 256, stoch: 16, classes: 16}
-  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  reward_head: {layers: 1, units: 256}
-  cont_head: {layers: 1, units: 256}
-  actor: {layers: 1, units: 256}
-  critic: {layers: 1, units: 256}
-  goal_encoder: {layers: 1, units: 256}
-  goal_decoder: {layers: 1, units: 256}
-  disag_head: {layers: 1, units: 256}
-  ctrl_embed: {layers: 1, units: 256}
-  expl_enc: {layers: 1, units: 256}
-  expl_dec: {layers: 1, units: 256}
-  .*\.lr: 1e-3
+  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3], strides: [2, 1]}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3], strides: [2, 1]}
+  reward_head: {layers: 2, units: 128}
+  cont_head: {layers: 2, units: 128}
+  actor: {layers: 2, units: 128}
+  critic: {layers: 2, units: 128}
+  goal_encoder: {layers: 2, units: 128}
+  goal_decoder: {layers: 2, units: 128}
+  disag_head: {layers: 2, units: 128}
+  ctrl_embed: {layers: 2, units: 128}
+  expl_enc: {layers: 2, units: 128}
+  expl_dec: {layers: 2, units: 128}
+  skill_shape: [4, 4]
+  .*\.lr: 3e-4
   env.repeat: 1
-  replay_chunk: 8
+  replay_chunk: 16
   train:
-    eval_every: 300
+    eval_every: 1e3
     log_keys_video: [render]
 
 minigrid_flat:
