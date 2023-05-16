@@ -113,7 +113,7 @@ defaults:
   encdec_opt: {opt: adam, lr: 1e-4, eps: 1e-6, clip: 100.0, wd: 1e-2, wd_pattern: 'kernel'}
   explorer: False
   explorer_repeat: False
-  expl_rew: adver
+  expl_rew: adver_reg
   manager_dist: onehot
   manager_grad: reinforce
   manager_actent: 0.5
@@ -181,19 +181,19 @@ dmc_proprio:
 minigrid_vision:
   env: {size: [7, 7], amount: 4, length: 200}
   task: minigrid_doorkey_vision
-  rssm: {units: 512, deter: 512, stoch: 16, classes: 16}
-  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  rssm: {units: 32, deter: 32, stoch: 16, classes: 16}
+  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 4, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
   decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  reward_head: {layers: 1, units: 512}
-  cont_head: {layers: 1, units: 512}
-  actor: {layers: 1, units: 512}
-  critic: {layers: 1, units: 512}
-  goal_encoder: {layers: 1, units: 512}
-  goal_decoder: {layers: 1, units: 512}
-  disag_head: {layers: 1, units: 512}
-  ctrl_embed: {layers: 1, units: 512}
-  expl_enc: {layers: 1, units: 512}
-  expl_dec: {layers: 1, units: 512}
+  reward_head: {layers: 1, units: 128}
+  cont_head: {layers: 1, units: 128}
+  actor: {layers: 1, units: 128}
+  critic: {layers: 1, units: 128}
+  goal_encoder: {layers: 1, units: 128}
+  goal_decoder: {layers: 1, units: 128}
+  disag_head: {layers: 1, units: 128}
+  ctrl_embed: {layers: 1, units: 128}
+  expl_enc: {layers: 1, units: 128}
+  expl_dec: {layers: 1, units: 128}
   skill_shape: [8, 8]
   .*\.lr: 3e-4
   env.repeat: 1
