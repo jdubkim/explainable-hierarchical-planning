@@ -114,9 +114,6 @@ class Hierarchy(tfutils.Module):
                 'stoch':
                 self.wm.rssm.get_stoch(goal),
             })['image'].mode()
-            # TODO: Uncomment this.
-            # outs['log_goal_render'] = self.render_func(outs['log_goal'])
-            # print("Rendering log goal.", outs['log_goal_render'].shape)
 
         carry = {'step': carry['step'] + 1, 'skill': skill, 'goal': goal}
         return outs, carry
@@ -130,7 +127,6 @@ class Hierarchy(tfutils.Module):
             metrics.update(self.train_vae_replay(data))
         if self.config.explorer:
             traj, mets = self.explorer.train(imagine, start, data)
-            print("Explorer metrics:", mets.keys())
             metrics.update({f'explorer_{k}': v for k, v in mets.items()})
             metrics.update(self.train_vae_imag(traj))
             if self.config.explorer_repeat:

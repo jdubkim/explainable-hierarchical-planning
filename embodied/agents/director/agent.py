@@ -2,6 +2,7 @@ import sys
 import time
 
 import embodied
+import numpy as np
 import ruamel.yaml as yaml
 import tensorflow as tf
 from tensorflow.keras import mixed_precision as prec
@@ -42,6 +43,7 @@ class Agent(tfagent.TFAgent):
             tf.zeros((len(obs['is_first']), ) + self.act_space.shape)))
         self.initial_train_state = tf.function(
             lambda obs: (self.wm.rssm.initial(len(obs['is_first']))))
+        self._max_pixel_value = np.array(self.config.max_pixel_value or 255)
 
     @tf.function
     def policy(self, obs, state=None, mode='train'):
@@ -103,12 +105,9 @@ class Agent(tfagent.TFAgent):
         preprocess_time = time.time()
         data = self.preprocess(data)
         preprocess_end = time.time()
-        print(f"Took {preprocess_end - preprocess_time} seconds.")
         report = {}
-        print(f"Reporting world moels.", end='\t')
         report.update(self.wm.report(data))
         wm_report_end = time.time()
-        print(f"Took {wm_report_end - preprocess_end} seconds.")
         mets = self.task_behavior.report(data)
         report.update({f'task_{k}': v for k, v in mets.items()})
         if self.expl_behavior is not self.task_behavior:
@@ -141,7 +140,7 @@ class Agent(tfagent.TFAgent):
             if key.startswith('log_') or key in ('key', ):
                 continue
             if len(value.shape) > 3 and value.dtype == tf.uint8:
-                value = value.astype(dtype) / 255.0
+                value = value.astype(dtype) / self._max_pixel_value
             else:
                 value = value.astype(tf.float32)
             obs[key] = value
@@ -159,8 +158,6 @@ class WorldModel(tfutils.Module):
     def __init__(self, obs_space, config):
         shapes = {k: tuple(v.shape) for k, v in obs_space.items()}
         shapes = {k: v for k, v in shapes.items() if not k.startswith('log_')}
-        print(f"World Model shapes: {shapes}")
-        print(f"Configs Encoder: {config.encoder}")
         self.config = config
         self.rssm = nets.RSSM(**config.rssm)
         self.encoder = nets.MultiEncoder(shapes, **config.encoder)
@@ -428,6 +425,9 @@ class VFunction(tfutils.Module):
         else:
             self.target_net = self.net
         self.opt = tfutils.Optimizer('critic', **self.config.critic_opt)
+    
+    def __call__(self, state):
+        return self.net(state)
 
     def train(self, traj, actor):
         metrics = {}
@@ -490,7 +490,7 @@ class VFunction(tfutils.Module):
             for s, d in zip(self.net.variables, self.target_net.variables):
                 d.assign(mix * s + (1 - mix) * d)
         self.updates.assign_add(1)
-
+    
 
 class QFunction(tfutils.Module):
     def __init__(self, rewfn, config):
@@ -506,6 +506,9 @@ class QFunction(tfutils.Module):
         else:
             self.target_net = self.net
         self.opt = tfutils.Optimizer('critic', **self.config.critic_opt)
+    
+    def __call__(self, state):
+        return self.net(state)
 
     def score(self, traj, actor):
         traj = tf.nest.map_structure(tf.stop_gradient, traj)

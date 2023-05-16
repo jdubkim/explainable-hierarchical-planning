@@ -12,10 +12,11 @@ defaults:
   replay_fixed: {prio_starts: 0.0, prio_ends: 1.0, sync: 0}
   replay_consec: {sync: 0}
   replay_prio: {prio_starts: 0.0, prio_ends: 1.0, sync: 0, fraction: 0.1, softmax: False, temp: 1.0, constant: 0.0, exponent: 0.5}
-  tf: {jit: True, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
+  tf: {jit: False, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
   eval_dir: ''
   filter: '.*'
   tbtt: 0
+  max_pixel_value: [255]
   train:
     steps: 1e6
     expl_until: 0
@@ -39,7 +40,7 @@ defaults:
   # Agent
   task_behavior: Hierarchy
   expl_behavior: None
-  batch_size: 64
+  batch_size: 16
   transform_rewards: off
   expl_noise: 0.0
   eval_noise: 0.0
@@ -179,28 +180,28 @@ dmc_proprio:
 
 minigrid_vision:
   env: {size: [7, 7], amount: 4, length: 200}
-  replay_size: 5e4
   task: minigrid_doorkey_vision
-  rssm: {units: 256, deter: 256, stoch: 16, classes: 16}
+  rssm: {units: 512, deter: 512, stoch: 16, classes: 16}
   encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
   decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  reward_head: {layers: 2, units: 128}
-  cont_head: {layers: 2, units: 128}
-  actor: {layers: 2, units: 128}
-  critic: {layers: 2, units: 128}
-  goal_encoder: {layers: 2, units: 128}
-  goal_decoder: {layers: 2, units: 128}
-  disag_head: {layers: 2, units: 128}
-  ctrl_embed: {layers: 2, units: 128}
-  expl_enc: {layers: 2, units: 128}
-  expl_dec: {layers: 2, units: 128}
-  skill_shape: [4, 4]
+  reward_head: {layers: 1, units: 512}
+  cont_head: {layers: 1, units: 512}
+  actor: {layers: 1, units: 512}
+  critic: {layers: 1, units: 512}
+  goal_encoder: {layers: 1, units: 512}
+  goal_decoder: {layers: 1, units: 512}
+  disag_head: {layers: 1, units: 512}
+  ctrl_embed: {layers: 1, units: 512}
+  expl_enc: {layers: 1, units: 512}
+  expl_dec: {layers: 1, units: 512}
+  skill_shape: [8, 8]
   .*\.lr: 3e-4
   env.repeat: 1
-  replay_chunk: 16
+  replay_chunk: 32
+  max_pixel_value: [10, 5, 2]
   train:
     eval_every: 1e3
-    log_keys_video: [render]
+    log_keys_video: [full_render]
 
 minigrid_flat:
 

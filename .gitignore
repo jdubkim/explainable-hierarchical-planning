@@ -6,3 +6,4 @@ MUJOCO_LOG.TXT
 slurm_outputs/*
 outputs/*
 logdir/*
+video/*

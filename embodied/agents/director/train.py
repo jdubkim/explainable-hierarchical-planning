@@ -100,8 +100,6 @@ def main(argv=None):
       render_func = env_for_render.render_from_obs
     else:
       render_func = None
-    print("Config.task: ", config.task)
-    print("Render_func: ", render_func)
 
     agent = agnt.Agent(env.obs_space, env.act_space, step, config, render_func)
     print(f"Run Type: {config.run}")
