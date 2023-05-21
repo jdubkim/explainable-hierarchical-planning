@@ -12,7 +12,7 @@ defaults:
   replay_fixed: {prio_starts: 0.0, prio_ends: 1.0, sync: 0}
   replay_consec: {sync: 0}
   replay_prio: {prio_starts: 0.0, prio_ends: 1.0, sync: 0, fraction: 0.1, softmax: False, temp: 1.0, constant: 0.0, exponent: 0.5}
-  tf: {jit: False, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
+  tf: {jit: True, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
   eval_dir: ''
   filter: '.*'
   tbtt: 0
@@ -113,7 +113,7 @@ defaults:
   encdec_opt: {opt: adam, lr: 1e-4, eps: 1e-6, clip: 100.0, wd: 1e-2, wd_pattern: 'kernel'}
   explorer: False
   explorer_repeat: False
-  expl_rew: adver_reg
+  expl_rew: adver
   manager_dist: onehot
   manager_grad: reinforce
   manager_actent: 0.5
@@ -181,34 +181,27 @@ dmc_proprio:
 minigrid_vision:
   env: {size: [7, 7], amount: 4, length: 200}
   task: minigrid_doorkey_vision
-  rssm: {units: 32, deter: 32, stoch: 16, classes: 16}
-  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 4, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 1, mlp_units: 256, cnn_depth: 16, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
-  reward_head: {layers: 1, units: 128}
-  cont_head: {layers: 1, units: 128}
-  actor: {layers: 1, units: 128}
-  critic: {layers: 1, units: 128}
-  goal_encoder: {layers: 1, units: 128}
-  goal_decoder: {layers: 1, units: 128}
-  disag_head: {layers: 1, units: 128}
-  ctrl_embed: {layers: 1, units: 128}
-  expl_enc: {layers: 1, units: 128}
-  expl_dec: {layers: 1, units: 128}
-  skill_shape: [8, 8]
-  .*\.lr: 3e-4
+  rssm: {units: 64, deter: 64, stoch: 16, classes: 16}
+  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 64, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 64, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
+  .*\.layers: 2
+  .*\.units: 64
+  .*\.lr: 1e-3
   env.repeat: 1
-  replay_chunk: 32
-  max_pixel_value: [10, 5, 2]
+  replay_chunk: 8
+  max_pixel_value: [1]
+  replay_size: 1e5
   train:
     eval_every: 1e3
     log_keys_video: [full_render]
+    train_fill: 1e3
+    eval_fill: 1e3
+  env_skill_duration: 4
+  train_skill_duration: 4
+  imag_horizon: 8
+  worker_report_horizon: 16
+  slow_target: False
 
-minigrid_flat:
-
-  task: minigrid_doorkey_flat
-  encoder: {mlp_keys: '.*', cnn_keys: '$^'}
-  decoder: {mlp_keys: '.*', cnn_keys: '$^'}
-  env.repeat: 1
 
 pinpad:
 

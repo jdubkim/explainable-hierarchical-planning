@@ -43,7 +43,7 @@ class Agent(tfagent.TFAgent):
             tf.zeros((len(obs['is_first']), ) + self.act_space.shape)))
         self.initial_train_state = tf.function(
             lambda obs: (self.wm.rssm.initial(len(obs['is_first']))))
-        self._max_pixel_value = np.array(self.config.max_pixel_value or 255)
+        self._max_pixel_values = np.array(self.config.max_pixel_value or 255)
 
     @tf.function
     def policy(self, obs, state=None, mode='train'):
@@ -140,7 +140,7 @@ class Agent(tfagent.TFAgent):
             if key.startswith('log_') or key in ('key', ):
                 continue
             if len(value.shape) > 3 and value.dtype == tf.uint8:
-                value = value.astype(dtype) / self._max_pixel_value
+                value = value.astype(dtype) / self._max_pixel_values
             else:
                 value = value.astype(tf.float32)
             obs[key] = value

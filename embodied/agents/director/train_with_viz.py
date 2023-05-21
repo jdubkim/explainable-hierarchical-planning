@@ -36,6 +36,9 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
     metrics['score'] = score
     metrics['reward_rate'] = (ep['reward'] - ep['reward'].min() >= 0.1).mean()
     logs = {}
+    should_video_now = should_video(step)
+    if not should_video_now:
+      ep.pop('full_render')
     for key, value in ep.items():
       if not args.log_zeros and key not in nonzeros and (value == 0).all():
         continue
@@ -47,16 +50,19 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
       if re.match(args.log_keys_max, key):
         logs[f'max_{key}'] = ep[key].max(0).mean()
     # Record and add the video to the metrics every evaluation step.
-    if should_video(step):
+    if should_video_now:
       for key in args.log_keys_video:
         if key == 'none':
           continue
+        if 'image' in ep:
+          ep['render'] = render_func(ep['image'])
         metrics[f'policy_{key}'] = ep[key]
         if 'log_goal' in ep:
           ep['log_goal_render'] = render_func(ep['log_goal'])
           if ep['render'].shape == ep['log_goal_render'].shape:
             metrics[f'policy_{key}_with_goal'] = np.concatenate(
                 [ep['render'], ep['log_goal_render']], 2)
+      
     logger.add(metrics, prefix='episode')
     logger.add(logs, prefix='logs')
     logger.add(train_replay.stats, prefix='replay')
