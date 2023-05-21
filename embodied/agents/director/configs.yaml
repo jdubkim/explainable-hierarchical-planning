@@ -178,9 +178,9 @@ dmc_proprio:
   decoder: {mlp_keys: '.*', cnn_keys: '$^'}
   env.repeat: 1
 
-minigrid_vision:
+minigrid_grid:
   env: {size: [7, 7], amount: 4, length: 200}
-  task: minigrid_doorkey_vision
+  task: minigrid_doorkey_grid
   rssm: {units: 64, deter: 64, stoch: 16, classes: 16}
   encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 64, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
   decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 2, mlp_units: 64, cnn_depth: 8, cnn_kernels: [3, 3, 3], strides: [1, 1, 1]}
@@ -202,6 +202,13 @@ minigrid_vision:
   worker_report_horizon: 16
   slow_target: False
 
+minigridImage:
+  task: minigridImage_doorkey_vision
+  encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 4, mlp_units: 256, cnn_depth: 32}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 4, mlp_units: 256, cnn_depth: 32}
+  rssm: {units: 512, deter: 512, stoch: 16, classes: 16, act: elu, norm: layer, initial: learned2, unroll: True}
+  .*\.layers: 4
+  .*\.units: 256
 
 pinpad:
 
