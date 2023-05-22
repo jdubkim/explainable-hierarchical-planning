@@ -17,14 +17,6 @@ class MiniGrid(embodied.Env):
         self._act_key = act_key
         self._done = True
         self._info = None
-        # Fields for rendering.
-        self._tile_size = 9
-        img_sample = self._env.reset()[self._obs_key]
-        self._render_shape = self.obs_rendered(img_sample).shape
-        self._full_image_shape = (self._env.width, self._env.height, 3)
-        self._full_render_shape = (self._env.width * self._tile_size,
-                                    self._env.height * self._tile_size, 3)
-        self._max_pixel_values = np.array([10, 5, 2])
 
     @property
     def info(self):
@@ -36,7 +28,7 @@ class MiniGrid(embodied.Env):
             # Only use the observation space for the specified key.
             spaces = {
                 self._obs_key:
-                self._env.observation_space.spaces.get(self._obs_key)
+                self._env.observation_space.spaces.get(self._obs_key),
             }
             spaces = self._flatten(spaces)
         else:
@@ -48,8 +40,6 @@ class MiniGrid(embodied.Env):
             'is_first': embodied.Space(bool),
             'is_last': embodied.Space(bool),
             'is_terminal': embodied.Space(bool),
-            'full_image': embodied.Space(np.uint8, self._full_image_shape),
-            'full_render': embodied.Space(np.uint8, self._full_render_shape),
         }
 
     @functools.cached_property
@@ -93,9 +83,7 @@ class MiniGrid(embodied.Env):
         obs.update(reward=np.float32(reward),
                    is_first=is_first,
                    is_last=is_last,
-                   is_terminal=is_terminal,
-                   full_image=self.full_obs(),
-                   full_render=self.full_obs_rendered())
+                   is_terminal=is_terminal)
         return obs
 
     def render(self):
@@ -141,48 +129,3 @@ class MiniGrid(embodied.Env):
         if hasattr(space, 'n'):
             return embodied.Space(np.int32, (), 0, space.n)
         return embodied.Space(space.dtype, space.shape, space.low, space.high)
-
-    def obs_rendered(self, obs):
-        if isinstance(obs, dict):
-            obs = obs[self._obs_key]
-        return self._env.get_obs_render(obs, tile_size=self._tile_size)
-    
-    def full_obs(self):
-        full_grid = self._env.grid.encode()
-        full_grid[self._env.agent_pos[0]][self._env.agent_pos[1]] = np.array([
-            OBJECT_TO_IDX['agent'],
-            COLOR_TO_IDX['red'],
-            self._env.agent_dir
-        ])
-
-        return full_grid 
-    
-    def full_obs_rendered(self):
-        return self._env.render(
-            mode='rgb_array',
-            highlight=True,
-            tile_size=self._tile_size
-        )
-
-    def render_from_obs(self, obs):
-        if isinstance(obs, dict):
-            obs = obs[self._obs_key]
-
-        # If not uint8, convert to uint8 and clip.
-        if obs.dtype != np.uint8:
-            for i, max_val in enumerate(self._max_pixel_values):
-                obs[..., i] = np.clip(obs[..., i], 0, max_val)
-            obs = obs.astype(np.uint8)
-
-        # If single frame, render an image
-        if len(obs.shape) == 3:
-            return self.obs_rendered(obs)
-        # If multiple frames, render each frame and stack them
-        elif len(obs.shape) == 4:
-            output_shape = (obs.shape[0], ) + self._render_shape
-            rendered_obs = np.zeros(output_shape, dtype=np.uint8)
-            for i in range(obs.shape[0]):
-                rendered_obs[i] = self.obs_rendered(obs[i])
-            return rendered_obs
-
-        raise ValueError(f'Invalid observation shape: {obs.shape}')

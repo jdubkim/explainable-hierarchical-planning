@@ -76,6 +76,7 @@ def load_single_env(
     elif suite == 'minigrid':
         from . import minigrid
         env = minigrid.MiniGrid(task)
+        env = embodied.wrappers.FlatObsWrapper(env)
     else:
         raise NotImplementedError(suite)
     for name, space in env.act_space.items():

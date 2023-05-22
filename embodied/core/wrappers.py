@@ -313,25 +313,22 @@ class RestartOnException(base.Wrapper):
             return self.env.step(action)
 
 
-# Wrappers for Gym-Minigrid Environments.
-# Taken from gym-minigrid repo: https://github.com/mit-acl/gym-minigrid/blob/master/gym_minigrid/wrappers.py
 class FlatObsWrapper(base.Wrapper):
     def __init__(self, env, key='image'):
         super().__init__(env)
-        self._key = key
-        img_space = self.env.obs_space['image']
-        self._shape = (1, functools.reduce(operator.mul, img_space.shape, 1))
+        self._keys = [key]
+        self._obs_space = self.env.obs_space.copy()
+        for key, value in self._obs_space.items():
+            if len(value.shape) == 3:
+                value.shape = (int(np.prod(value.shape)),)
+                self._keys.append(key)
 
     @functools.cached_property
     def obs_space(self):
-        spaces = self.env.obs_space
-        spaces[self._key] = spacelib.Space(np.uint8, self._shape)
-        return spaces
+        return self._obs_space
 
     def step(self, action):
-        obs = self.env.step(action)
-        obs[self._key] = obs[self._key].reshape(self._shape)
-        keys_to_remove = ('direction', 'mission')
-        for key in keys_to_remove:
-            obs.pop(key, None)
+        obs = self.env.step(action).copy()
+        for key in self._keys:
+            obs[key] = obs[key].flatten()
         return obs

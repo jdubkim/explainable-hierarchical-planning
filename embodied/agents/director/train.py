@@ -93,13 +93,7 @@ def main(argv=None):
                                  mode='train',
                                  logdir=logdir,
                                  **config.env)
-    if 'minigrid' in config.task:
-      # Create a same dummy environment (no batch)
-      env_for_render = embodied.envs.load_single_env(config.task)
-      # Retrieve rendering function
-      render_func = env_for_render.render_from_obs
-    else:
-      render_func = None
+    render_func = None
 
     agent = agnt.Agent(env.obs_space, env.act_space, step, config, render_func)
     print(f"Run Type: {config.run}")
