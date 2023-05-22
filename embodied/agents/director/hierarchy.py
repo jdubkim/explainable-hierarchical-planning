@@ -12,9 +12,9 @@ from . import tfutils
 
 
 class Hierarchy(tfutils.Module):
-    def __init__(self, wm, act_space, config, render_func=None):
+    def __init__(self, wm, act_space, config, renderer=None):
         # Render goal if specified.
-        self.render_func = render_func
+        self.renderer = renderer
         self.wm = wm
         self.config = config
         self.extr_reward = lambda traj: self.wm.heads['reward'](traj).mean()[1:

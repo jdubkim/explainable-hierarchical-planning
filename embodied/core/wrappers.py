@@ -316,12 +316,11 @@ class RestartOnException(base.Wrapper):
 class FlatObsWrapper(base.Wrapper):
     def __init__(self, env, key='image'):
         super().__init__(env)
-        self._keys = [key]
+        self._keys = [key] if isinstance(key, str) else key
         self._obs_space = self.env.obs_space.copy()
         for key, value in self._obs_space.items():
             if len(value.shape) == 3:
                 value.shape = (int(np.prod(value.shape)),)
-                self._keys.append(key)
 
     @functools.cached_property
     def obs_space(self):

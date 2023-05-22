@@ -13,13 +13,13 @@ from . import tfutils
 
 
 class TFAgent(tfutils.Module, embodied.Agent):
-    def __new__(subcls, obs_space, act_space, step, config, render_func=None):
+    def __new__(subcls, obs_space, act_space, step, config, renderer=None):
         self = super().__new__(TFAgent)
         self.config = config.tf
         self.strategy = self._setup()
         self.agent = super().__new__(subcls)
         with self._strategy_scope():
-            self.agent.__init__(obs_space, act_space, step, config, render_func)
+            self.agent.__init__(obs_space, act_space, step, config, renderer)
         self._cache_fns = config.tf.jit and not self.strategy
         self._cached_fns = {}
         return self

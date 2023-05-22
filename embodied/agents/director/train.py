@@ -93,9 +93,14 @@ def main(argv=None):
                                  mode='train',
                                  logdir=logdir,
                                  **config.env)
-    render_func = None
 
-    agent = agnt.Agent(env.obs_space, env.act_space, step, config, render_func)
+    if 'minigrid' in config.task:
+      rendering_env = embodied.envs.load_single_env(config.task)
+      renderer = lambda x: rendering_env.render_from_obs(x)
+    else:
+      renderer = None
+
+    agent = agnt.Agent(env.obs_space, env.act_space, step, config, renderer)
     print(f"Run Type: {config.run}")
     if config.run == 'train':
       replay = make_replay('episodes', config.replay_size)

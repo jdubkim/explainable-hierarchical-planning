@@ -10,14 +10,14 @@ from .hierarchy import Hierarchy  # noqa
 
 class Greedy(tfutils.Module):
 
-  def __init__(self, wm, act_space, config, render_func=None):
+  def __init__(self, wm, act_space, config, renderer=None):
     rewfn = lambda s: wm.heads['reward'](s).mean()[1:]
     if config.critic_type == 'vfunction':
       critics = {'extr': agent.VFunction(rewfn, config)}
     elif config.critic_type == 'qfunction':
       critics = {'extr': agent.QFunction(rewfn, config)}
     self.ac = agent.ImagActorCritic(critics, {'extr': 1.0}, act_space, config)
-    self.render_func = render_func
+    self.renderer = renderer
 
   def initial(self, batch_size):
     return self.ac.initial(batch_size)
@@ -34,10 +34,10 @@ class Greedy(tfutils.Module):
 
 class Random(tfutils.Module):
 
-  def __init__(self, wm, act_space, config, render_func=None):
+  def __init__(self, wm, act_space, config, renderer=None):
     self.config = config
     self.act_space = act_space
-    self.render_func = render_func
+    self.renderer = renderer
 
   def initial(self, batch_size):
     return tf.zeros(batch_size)
@@ -68,7 +68,7 @@ class Explore(tfutils.Module):
       'pbe': expl.PBE,
   }
 
-  def __init__(self, wm, act_space, config, render_func=None):
+  def __init__(self, wm, act_space, config, renderer=None):
     self.config = config
     self.rewards = {}
     critics = {}
@@ -87,7 +87,7 @@ class Explore(tfutils.Module):
         self.rewards[key] = reward
     scales = {k: v for k, v in config.expl_rewards.items() if v}
     self.ac = agent.ImagActorCritic(critics, scales, act_space, config)
-    self.render_func = render_func
+    self.renderer = renderer
 
   def initial(self, batch_size):
     return self.ac.initial(batch_size)

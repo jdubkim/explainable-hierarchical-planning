@@ -140,30 +140,6 @@ defaults:
   expl_kl: {impl: mult, scale: 0.1, target: 10.0, min: 1e-2, max: 1.0, vel: 0.1}
   expl_vae_elbo: False
 
-dmlab:
-
-  task: dmlab_rooms_collect_good_objects_train
-  encoder: {mlp_keys: 'reward', cnn_keys: 'image'}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  env.repeat: 4
-  train.steps: 5e7
-
-atari:
-
-  task: atari_pong
-  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  env: {gray: True, repeat: 4}
-  train.steps: 5e7
-
-crafter:
-
-  task: crafter_reward
-  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  train.log_keys_max: '^log_achievement_.*'
-  train.log_keys_sum: '^log_reward$'
-
 dmc_vision:
 
   task: dmc_walker_walk
@@ -203,7 +179,7 @@ minigrid_vision:
 
 minigrid_flat:
   env: {size: [7, 7], amount: 1}
-  task: minigrid_doorkey_flat
+  task: minigrid_Empty-6x6
   rssm: {units: 128, deter: 128, stoch: 16, classes: 16}
   encoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 128}
   decoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 128}
@@ -214,7 +190,7 @@ minigrid_flat:
   max_pixel_value: [1]
   train:
     eval_every: 1e3
-    log_keys_video: [image]
+    log_keys_video: [full_render, render]
     train_fill: 1e3
     eval_fill: 1e3
   env_skill_duration: 4
@@ -222,19 +198,6 @@ minigrid_flat:
   imag_horizon: 8
   worker_report_horizon: 16
   task_behavior: Greedy
-
-pinpad:
-
-  task: pinpad_five
-  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-
-loconav:
-
-  task: loconav_ant_maze_m
-  encoder: {mlp_keys: '.*(joints|sensors|actuator|effectors|appendages|bodies|height|zaxis).*', cnn_keys: 'image'}
-  decoder: {mlp_keys: '.*(joints|sensors|actuator|effectors|appendages|bodies|height|zaxis).*', cnn_keys: 'image'}
-  train.log_keys_max: '^log_.*'
 
 debug:
 

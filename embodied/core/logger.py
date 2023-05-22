@@ -163,12 +163,12 @@ class TensorBoardOutput(AsyncOutput):
     for step, name, value in summaries:
       if len(value.shape) == 0:
         tf.summary.scalar(name, value, step)
-    #   elif len(value.shape) == 2:
-    #     tf.summary.image(name, value, step)
-    #   elif len(value.shape) == 3:
-    #     tf.summary.image(name, value, step)
-    #   elif len(value.shape) == 4:
-    #     self._video_summary(name, value, step)
+      elif len(value.shape) == 2:
+        tf.summary.image(name, value, step)
+      elif len(value.shape) == 3:
+        tf.summary.image(name, value, step)
+      elif len(value.shape) == 4:
+        self._video_summary(name, value, step)
     self._writer.flush()
 
   def _video_summary(self, name, video, step):
