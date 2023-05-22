@@ -61,7 +61,7 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
           print(f"ep['render'].shape: {ep['render'].shape}")
           print(f"ep['log_goal_render'].shape: {ep['log_goal_render'].shape}")
           if ep['render'].shape == ep['log_goal_render'].shape:
-            metrics[f'policy_{key}_with_goal'] = np.concatenate(
+            metrics[f'policy_render_with_goal'] = np.concatenate(
                 [ep['render'], ep['log_goal_render']], 2)
       
     logger.add(metrics, prefix='episode')

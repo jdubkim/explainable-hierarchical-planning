@@ -181,12 +181,12 @@ minigrid_flat:
   env: {size: [7, 7], amount: 1}
   task: minigrid_Empty-6x6
   rssm: {units: 128, deter: 128, stoch: 16, classes: 16}
-  encoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 128}
-  decoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 128}
+  encoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 64}
+  decoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 64}
   .*\.layers: 2
-  .*\.units: 128
+  .*\.units: 64
   .*\.lr: 1e-3
-  replay_chunk: 16
+  replay_chunk: 8
   max_pixel_value: [1]
   train:
     eval_every: 1e3
@@ -197,7 +197,6 @@ minigrid_flat:
   train_skill_duration: 4
   imag_horizon: 8
   worker_report_horizon: 16
-  task_behavior: Greedy
 
 debug:
 
