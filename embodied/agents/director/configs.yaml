@@ -12,7 +12,7 @@ defaults:
   replay_fixed: {prio_starts: 0.0, prio_ends: 1.0, sync: 0}
   replay_consec: {sync: 0}
   replay_prio: {prio_starts: 0.0, prio_ends: 1.0, sync: 0, fraction: 0.1, softmax: False, temp: 1.0, constant: 0.0, exponent: 0.5}
-  tf: {jit: False, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
+  tf: {jit: True, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
   eval_dir: ''
   filter: '.*'
   tbtt: 0
@@ -178,21 +178,24 @@ minigrid_vision:
   worker_report_horizon: 16
 
 minigrid_flat:
-  env: {size: [7, 7], amount: 1}
+  env: {size: [7, 7], amount: 1, length: 20}
   task: minigrid_Empty-6x6
-  rssm: {units: 128, deter: 128, stoch: 16, classes: 16}
-  encoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 64}
-  decoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 64}
+  replay_size: 5e4
+  rssm: {units: 64, deter: 64, stoch: 8, classes: 8}
+  encoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 32}
+  decoder: {mlp_keys: 'image', cnn_keys: '$^', mlp_layers: 2, mlp_units: 32}
   .*\.layers: 2
-  .*\.units: 64
+  .*\.units: 32
   .*\.lr: 1e-3
-  replay_chunk: 8
-  max_pixel_value: [1]
+  .*\.wd: 0.0
+  replay_chunk: 16
+  max_pixel_value: [10, 5, 2]
   train:
     eval_every: 1e3
     log_keys_video: [full_render, render]
     train_fill: 1e3
     eval_fill: 1e3
+    train_every: 4
   env_skill_duration: 4
   train_skill_duration: 4
   imag_horizon: 8

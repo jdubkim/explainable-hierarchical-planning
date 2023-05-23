@@ -172,8 +172,18 @@ class MiniGrid(embodied.Env):
         # If not uint8, convert to uint8 and clip.
         if obs.dtype != np.uint8:
             for i, max_val in enumerate(self._max_pixel_values):
+                obs[..., i] = obs[..., i] * max_val
                 obs[..., i] = np.clip(obs[..., i], 0, max_val)
             obs = obs.astype(np.uint8)
+        
+        # Check if the model predicts agent in other position
+        positions = np.where(obs[..., 0] == OBJECT_TO_IDX['agent'])
+        for i in range(len(positions[0])):
+            obs[positions[0][i]][positions[1][i]] = np.array([
+                OBJECT_TO_IDX['empty'],
+                COLOR_TO_IDX['yellow'],
+                0
+            ])
 
         # If single frame, render an image
         if len(obs.shape) == 3:
