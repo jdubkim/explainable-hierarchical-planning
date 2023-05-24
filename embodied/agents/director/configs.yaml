@@ -192,17 +192,12 @@ minigridImage:
   decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 4, mlp_units: 256, cnn_depth: 32}
   rssm: {units: 512, deter: 512, stoch: 16, classes: 16, act: elu, norm: layer, initial: learned2, unroll: True}
   .*\.layers: 4
-  .*\.units: 256
+  .*\.units: 128
   train:
     eval_every: 1e3
     train_fill: 1e3
     eval_fill: 1e3
-    log_keys_video: [image, full_render]
-  env_skill_duration: 4
-  train_skill_duration: 4
-  imag_horizon: 8
-  worker_report_horizon: 16
-  replay_chunk: 8
+    log_keys_video: [image]
 
 debug:
 

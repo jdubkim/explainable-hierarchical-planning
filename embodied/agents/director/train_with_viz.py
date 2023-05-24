@@ -51,14 +51,10 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
           continue
         metrics[f'policy_{key}'] = ep[key]
         if 'log_goal' in ep:
-          if ep['image'].shape == ep['log_goal'].shape:
+          if ep[key].shape == ep['log_goal'].shape:
             goal = (255 * ep['log_goal']).astype(np.uint8)
             metrics[f'policy_{key}_with_goal'] = np.concatenate(
-                [ep['image'], goal], 2)
-        if 'log_goal' in ep:
-          if ep[key].shape == ep['log_goal'].shape:
-            metrics[f'policy_{key}_with_goal'] = np.concatenate(
-                [ep[key], ep['log_goal']], 2)
+                [ep[key], goal], 2)
       
     logger.add(metrics, prefix='episode')
     logger.add(logs, prefix='logs')
