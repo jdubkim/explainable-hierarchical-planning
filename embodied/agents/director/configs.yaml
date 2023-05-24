@@ -140,14 +140,6 @@ defaults:
   expl_kl: {impl: mult, scale: 0.1, target: 10.0, min: 1e-2, max: 1.0, vel: 0.1}
   expl_vae_elbo: False
 
-dmlab:
-
-  task: dmlab_rooms_collect_good_objects_train
-  encoder: {mlp_keys: 'reward', cnn_keys: 'image'}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  env.repeat: 4
-  train.steps: 5e7
-
 atari:
 
   task: atari_pong
@@ -155,14 +147,6 @@ atari:
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
   env: {gray: True, repeat: 4}
   train.steps: 5e7
-
-crafter:
-
-  task: crafter_reward
-  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  train.log_keys_max: '^log_achievement_.*'
-  train.log_keys_sum: '^log_reward$'
 
 dmc_vision:
 
@@ -203,25 +187,22 @@ minigrid_grid:
   slow_target: False
 
 minigridImage:
-  task: minigridImage_doorkey_vision
+  task: minigridImage_Empty-6x6
   encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 4, mlp_units: 256, cnn_depth: 32}
   decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 4, mlp_units: 256, cnn_depth: 32}
   rssm: {units: 512, deter: 512, stoch: 16, classes: 16, act: elu, norm: layer, initial: learned2, unroll: True}
   .*\.layers: 4
   .*\.units: 256
-
-pinpad:
-
-  task: pinpad_five
-  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
-  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
-
-loconav:
-
-  task: loconav_ant_maze_m
-  encoder: {mlp_keys: '.*(joints|sensors|actuator|effectors|appendages|bodies|height|zaxis).*', cnn_keys: 'image'}
-  decoder: {mlp_keys: '.*(joints|sensors|actuator|effectors|appendages|bodies|height|zaxis).*', cnn_keys: 'image'}
-  train.log_keys_max: '^log_.*'
+  train:
+    eval_every: 1e3
+    train_fill: 1e3
+    eval_fill: 1e3
+    log_keys_video: [image, full_render]
+  env_skill_duration: 4
+  train_skill_duration: 4
+  imag_horizon: 8
+  worker_report_horizon: 16
+  replay_chunk: 8
 
 debug:
 

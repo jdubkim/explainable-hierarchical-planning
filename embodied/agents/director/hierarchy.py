@@ -12,9 +12,8 @@ from . import tfutils
 
 
 class Hierarchy(tfutils.Module):
-    def __init__(self, wm, act_space, config, render_func=None):
+    def __init__(self, wm, act_space, config):
         # Render goal if specified.
-        self.render_func = render_func
         self.wm = wm
         self.config = config
         self.extr_reward = lambda traj: self.wm.heads['reward'](traj).mean()[1:
@@ -447,7 +446,7 @@ class Hierarchy(tfutils.Module):
         # Add regularisation term, critic value of decoded goal
         print("Trajectory: ", traj.keys())
         print("Decoded goal: ", dec.mode())
-        critic = self.manager.critics['expl'](dec.mode(), context).item()
+        critic = self.manager.critics['expl']({'goal': dec.mode(), 'context': context}).item()
         reg = self.worker.critic({'goal': dec.mode(), 'context': context})[1:]
         alpha = self.config.adver_reg  # Regularisation weight
         if self.config.adver_impl == 'abs':
