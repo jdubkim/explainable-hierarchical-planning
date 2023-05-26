@@ -25,6 +25,7 @@ class Hierarchy(tfutils.Module):
         wconfig = config.update({
             'actor.inputs': self.config.worker_inputs,
             'critic.inputs': self.config.worker_inputs,
+            'is_manager': False,
         })
         self.worker = agent.ImagActorCritic(
             {
@@ -36,6 +37,7 @@ class Hierarchy(tfutils.Module):
         mconfig = config.update({
             'actor_grad_cont': 'reinforce',
             'actent.target': config.manager_actent,
+            'is_manager': True,
         })
         self.manager = agent.ImagActorCritic(
             {

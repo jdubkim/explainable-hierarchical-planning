@@ -121,6 +121,9 @@ defaults:
   adver_reg: 0.1
   manager_delta: False
   goal_kl: True
+  is_manager: False
+  goal_regularised: False
+  goal_regularisation_weight: 0.1
 
   # Exploration
   expl_rewards: {extr: 0.0, disag: 0.0, vae: 0.0, ctrl: 0.0, pbe: 0.0}
