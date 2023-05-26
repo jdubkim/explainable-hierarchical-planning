@@ -422,9 +422,6 @@ class VFunction(tfutils.Module):
         else:
             self.target_net = self.net
         self.opt = tfutils.Optimizer('critic', **self.config.critic_opt)
-    
-    def __call__(self, traj):
-        return self.target_net._out(traj).mean()
 
     def train(self, traj, actor):
         metrics = {}
@@ -504,9 +501,6 @@ class QFunction(tfutils.Module):
             self.target_net = self.net
         self.opt = tfutils.Optimizer('critic', **self.config.critic_opt)
     
-    def __call__(self, state):
-        return self.net({**traj})
-
     def score(self, traj, actor):
         traj = tf.nest.map_structure(tf.stop_gradient, traj)
         ret = self.net({**traj, 'action': actor(traj).sample()}).mode()[:-1]
