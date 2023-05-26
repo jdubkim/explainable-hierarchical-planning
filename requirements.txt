@@ -11,3 +11,6 @@ rich
 ruamel.yaml
 tensorflow==2.8.2
 tensorflow_probability==0.16.0
+wandb
+moviepy
+imageio

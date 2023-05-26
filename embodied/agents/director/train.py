@@ -48,19 +48,24 @@ def main(argv=None):
 
   if config.run == 'acting':
     actordir = logdir / f'actor{parsed.actor_id}'
-    logger = embodied.Logger(step, [
+    output_list = [
         embodied.logger.TerminalOutput(config.filter),
         embodied.logger.JSONLOutput(actordir, 'metrics.jsonl'),
         embodied.logger.TensorBoardOutput(actordir),
-    ],
+    ]
+    if config.wandb:
+        output_list.append(embodied.logger.WandbOutput(actordir))
+    logger = embodied.Logger(step, output_list,
                              multiplier=config.env.repeat * parsed.actors)
   else:
-    logger = embodied.Logger(step, [
+    output_list = [
         embodied.logger.TerminalOutput(config.filter),
         embodied.logger.JSONLOutput(logdir, 'metrics.jsonl'),
         embodied.logger.TensorBoardOutput(logdir),
-    ],
-                             multiplier=config.env.repeat)
+    ]
+    if config.wandb:
+        output_list.append(embodied.logger.WandbOutput(logdir))
+    logger = embodied.Logger(step, output_list, multiplier=config.env.repeat)
 
   chunk = config.replay_chunk
   if config.replay == 'fixed':
