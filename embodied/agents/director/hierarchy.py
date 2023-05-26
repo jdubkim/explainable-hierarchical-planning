@@ -443,11 +443,12 @@ class Hierarchy(tfutils.Module):
         dec = self.dec({'skill': enc.sample(), 'context': context})
         ll = dec.log_prob(feat)
         kl = tfd.kl_divergence(enc, self.prior)
+        print("Decoder", dec)
+        print("Context: ", context)
+        print("Feat: ", feat)
         # Add regularisation term, critic value of decoded goal
-        print("Trajectory: ", traj.keys())
-        print("Decoded goal: ", dec.mode())
-        critic = self.manager.critics['expl']({'goal': dec.mode(), 'context': context}).item()
-        reg = self.worker.critic({'goal': dec.mode(), 'context': context})[1:]
+        # expl_critic = tf.stop_gradient(self.manager.critics['expl'](traj))
+        expl_critic = self.manager.critics['expl']({'goal': dec.mode()})
         alpha = self.config.adver_reg  # Regularisation weight
         if self.config.adver_impl == 'abs':
             out = tf.abs(dec.mode() - feat).mean(-1)[1:]
@@ -457,7 +458,7 @@ class Hierarchy(tfutils.Module):
             out = (kl - ll / self.kl.scale())[1:]
         elif self.config.adver_impl == 'elbo_unscaled':
             out = (kl - ll)[1:]
-        return out + alpha * reg
+        return out + alpha * expl_critic.mean()
         raise NotImplementedError(self.config.adver_impl)
 
     def split_traj(self, traj):
