@@ -24,8 +24,6 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
     timer.wrap('replay', train_replay, ['_sample'])
 
   nonzeros = set()
-  env_for_render = embodied.envs.minigrid.MiniGrid(task='doorkey_vision')
-  render_func = lambda x: env_for_render.render_from_obs(x)
   
   def per_episode(ep):
     metrics = {}
@@ -38,7 +36,8 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
     logs = {}
     should_video_now = should_video(step)
     if not should_video_now:
-      ep.pop('full_render')
+      full_render = ep.pop('full_render')
+      del full_render
     for key, value in ep.items():
       if not args.log_zeros and key not in nonzeros and (value == 0).all():
         continue
@@ -54,14 +53,12 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
       for key in args.log_keys_video:
         if key == 'none':
           continue
-        if 'image' in ep:
-          ep['render'] = render_func(ep['image'])
         metrics[f'policy_{key}'] = ep[key]
         if 'log_goal' in ep:
-          ep['log_goal_render'] = render_func(ep['log_goal'])
-          if ep['render'].shape == ep['log_goal_render'].shape:
-            metrics[f'policy_{key}_with_goal'] = np.concatenate(
-                [ep['render'], ep['log_goal_render']], 2)
+          if ep[key].shape == ep['log_goal'].shape:
+            goal = (255 * ep['log_goal']).astype(np.uint8)
+            metrics[f'policy_image_with_goal'] = np.concatenate(
+                [ep['image'], goal], 2)
       
     logger.add(metrics, prefix='episode')
     logger.add(logs, prefix='logs')

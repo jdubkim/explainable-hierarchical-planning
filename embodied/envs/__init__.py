@@ -76,6 +76,10 @@ def load_single_env(
     elif suite == 'minigrid':
         from . import minigrid
         env = minigrid.MiniGrid(task)
+    elif suite == 'minigridImage':
+        from . import minigrid_image
+        env = minigrid_image.MiniGridImage(task)
+        env = embodied.wrappers.ResizeImage(env, size)
     else:
         raise NotImplementedError(suite)
     for name, space in env.act_space.items():
@@ -92,6 +96,7 @@ def load_single_env(
     env = embodied.wrappers.ExpandScalars(env)
     if checks:
         env = embodied.wrappers.CheckSpaces(env)
+    
     return env
 
 

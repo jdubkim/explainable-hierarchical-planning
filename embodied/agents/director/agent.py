@@ -1,5 +1,4 @@
 import sys
-import time
 
 import embodied
 import numpy as np
@@ -19,23 +18,21 @@ class Agent(tfagent.TFAgent):
     configs = yaml.YAML(typ='safe').load(
         (embodied.Path(sys.argv[0]).parent / 'configs.yaml').read())
 
-    def __init__(self, obs_space, act_space, step, config, render_func=None):
+    def __init__(self, obs_space, act_space, step, config):
         self.config = config
         self.obs_space = obs_space
         self.act_space = act_space['action']
         self.step = step
         self.wm = WorldModel(obs_space, config)
-        self.render_func = render_func
         self.task_behavior = getattr(behaviors,
                                      config.task_behavior)(self.wm,
                                                            self.act_space,
-                                                           self.config,
-                                                           self.render_func)
+                                                           self.config)
         if config.expl_behavior == 'None':
             self.expl_behavior = self.task_behavior
         else:
             self.expl_behavior = getattr(behaviors, config.expl_behavior)(
-                self.wm, self.act_space, self.config, self.render_func)
+                self.wm, self.act_space, self.config)
         self.initial_policy_state = tf.function(lambda obs: (
             self.wm.rssm.initial(len(obs['is_first'])),
             self.task_behavior.initial(len(obs['is_first'])),
@@ -51,8 +48,11 @@ class Agent(tfagent.TFAgent):
         if state is None:
             state = self.initial_policy_state(obs)
         obs = self.preprocess(obs)
+        # State consists of (latent, task_state, expl_state, action).
         latent, task_state, expl_state, action = state
+        # Encode observation into embedding.
         embed = self.wm.encoder(obs)
+        # Get latent state from RSSM.
         latent, _ = self.wm.rssm.obs_step(latent, action, embed,
                                           obs['is_first'])
         noise = self.config.expl_noise
@@ -102,12 +102,9 @@ class Agent(tfagent.TFAgent):
     @tf.function
     def report(self, data):
         self.config.tf.jit and print('Tracing report function.')
-        preprocess_time = time.time()
         data = self.preprocess(data)
-        preprocess_end = time.time()
         report = {}
         report.update(self.wm.report(data))
-        wm_report_end = time.time()
         mets = self.task_behavior.report(data)
         report.update({f'task_{k}': v for k, v in mets.items()})
         if self.expl_behavior is not self.task_behavior:
@@ -304,7 +301,7 @@ class ImagActorCritic(tfutils.Module):
         critics = {k: v for k, v in critics.items() if scales[k]}
         for key, scale in scales.items():
             assert not scale or key in critics, key
-        self.critics = {k: v for k, v in critics.items() if scales[k]}
+        self.critics = critics 
         self.scales = scales
         self.act_space = act_space
         self.config = config
@@ -426,8 +423,8 @@ class VFunction(tfutils.Module):
             self.target_net = self.net
         self.opt = tfutils.Optimizer('critic', **self.config.critic_opt)
     
-    def __call__(self, state):
-        return self.net(state)
+    def __call__(self, traj):
+        return self.target_net._out(traj).mean()
 
     def train(self, traj, actor):
         metrics = {}
@@ -508,7 +505,7 @@ class QFunction(tfutils.Module):
         self.opt = tfutils.Optimizer('critic', **self.config.critic_opt)
     
     def __call__(self, state):
-        return self.net(state)
+        return self.net({**traj})
 
     def score(self, traj, actor):
         traj = tf.nest.map_structure(tf.stop_gradient, traj)
