@@ -18,6 +18,9 @@ class MiniGridImage(embodied.Env):
         self._act_key = act_key
         self._done = True
         self._info = None
+        self._tile_size = 9
+        self._full_render_shape = (self._env.width * self._tile_size,
+                                      self._env.height * self._tile_size, 3)
 
     @property
     def info(self):
@@ -41,6 +44,7 @@ class MiniGridImage(embodied.Env):
             'is_first': embodied.Space(bool),
             'is_last': embodied.Space(bool),
             'is_terminal': embodied.Space(bool),
+            'full_render': embodied.Space(np.uint8, self._full_render_shape),
         }
 
     @functools.cached_property
@@ -84,11 +88,12 @@ class MiniGridImage(embodied.Env):
         obs.update(reward=np.float32(reward),
                    is_first=is_first,
                    is_last=is_last,
-                   is_terminal=is_terminal)
+                   is_terminal=is_terminal,
+                   full_render=self.render())
         return obs
 
     def render(self):
-        return self._env.render('rgb_array')
+        return self._env.render('rgb_array', highlight=True, tile_size=self._tile_size)
 
     def close(self):
         try:

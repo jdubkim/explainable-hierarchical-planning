@@ -113,7 +113,7 @@ defaults:
   encdec_opt: {opt: adam, lr: 1e-4, eps: 1e-6, clip: 100.0, wd: 1e-2, wd_pattern: 'kernel'}
   explorer: False
   explorer_repeat: False
-  expl_rew: adver_reg
+  expl_rew: adver
   manager_dist: onehot
   manager_grad: reinforce
   manager_actent: 0.5

@@ -96,6 +96,7 @@ def load_single_env(
     env = embodied.wrappers.ExpandScalars(env)
     if checks:
         env = embodied.wrappers.CheckSpaces(env)
+    
     return env
 
 
