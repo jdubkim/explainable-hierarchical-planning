@@ -354,6 +354,7 @@ class ImagActorCritic(tfutils.Module):
         for key, critic in self.critics.items():
             mets = critic.train(traj, self.actor)
             metrics.update({f'{key}_{k}': v for k, v in mets.items()})
+        with tape:
             scores = []
             for key, critic in self.critics.items():
                 ret, baseline = critic.score(traj, self.actor)

@@ -36,7 +36,8 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
     logs = {}
     should_video_now = should_video(step)
     if not should_video_now:
-      ep.pop('full_render')
+      full_render = ep.pop('full_render')
+      del full_render
     for key, value in ep.items():
       if not args.log_zeros and key not in nonzeros and (value == 0).all():
         continue
@@ -56,8 +57,8 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
         if 'log_goal' in ep:
           if ep[key].shape == ep['log_goal'].shape:
             goal = (255 * ep['log_goal']).astype(np.uint8)
-            metrics[f'policy_{key}_with_goal'] = np.concatenate(
-                [ep[key], goal], 2)
+            metrics[f'policy_image_with_goal'] = np.concatenate(
+                [ep['image'], goal], 2)
       
     logger.add(metrics, prefix='episode')
     logger.add(logs, prefix='logs')

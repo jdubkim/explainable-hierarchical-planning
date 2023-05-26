@@ -202,6 +202,7 @@ minigridImage:
   ctrl_head: {layers: 1, units: 64}
   expl_enc: {layers: 3, units: 256}
   expl_dec: {layers: 3, units: 256}
+  .*\.lr: 3e-4
 
   # HRL
   env_skill_duration: 4
@@ -215,7 +216,7 @@ minigridImage:
     eval_every: 1e3
     train_fill: 1e3
     eval_fill: 1e3
-    log_keys_video: [image]
+    log_keys_video: [image, full_render]
 
 debug:
 
