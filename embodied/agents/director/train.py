@@ -54,7 +54,7 @@ def main(argv=None):
         embodied.logger.TensorBoardOutput(actordir),
     ]
     if config.wandb:
-        output_list.append(embodied.logger.WandbOutput(actordir))
+        output_list.append(embodied.logger.WandbOutput(actordir, config))
     logger = embodied.Logger(step, output_list,
                              multiplier=config.env.repeat * parsed.actors)
   else:
@@ -64,7 +64,7 @@ def main(argv=None):
         embodied.logger.TensorBoardOutput(logdir),
     ]
     if config.wandb:
-        output_list.append(embodied.logger.WandbOutput(logdir))
+        output_list.append(embodied.logger.WandbOutput(logdir, config))
     logger = embodied.Logger(step, output_list, multiplier=config.env.repeat)
 
   chunk = config.replay_chunk

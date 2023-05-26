@@ -190,14 +190,15 @@ class TensorBoardOutput(AsyncOutput):
 
 
 class WandbOutput(TensorBoardOutput):
-    def __init__(self, logdir, fps=2, parallel=True):
+    def __init__(self, logdir, config, fps=2, parallel=True):
         super().__init__(logdir, fps, parallel)
+        self.config = config
     
     def _write(self, summaries):
         import wandb
         if not self._writer:
             self._writer = wandb.init(
-                dir=self._logdir, project='director', job_type='logging')
+                dir=self._logdir, config=self.config, project='director', job_type='logging')
         for step, name, value in summaries:
             if len(value.shape) == 0:
                 self._writer.log({name: value}, step=step)
