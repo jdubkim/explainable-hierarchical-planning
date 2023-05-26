@@ -213,6 +213,7 @@ minigridImage:
   skill_shape: [4, 4]
   worker_report_horizon: 16
   imag_horizon: 8
+  replay_chunk: 16
 
   train:
     steps: 2e5
