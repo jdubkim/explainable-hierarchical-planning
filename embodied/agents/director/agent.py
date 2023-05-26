@@ -398,7 +398,7 @@ class ImagActorCritic(tfutils.Module):
         # Regularise the goal prediction loss using critics
         if self.config.is_manager and self.config.goal_regularised:
             goal_loss = self.critics['expl'].score(traj, self.actor)[1:]
-            loss += goal_loss * self.goal_regularisation_weight
+            loss -= goal_loss * self.goal_regularisation_weight
 
         shape = (self.act_space.shape[:-1]
                  if self.act_space.discrete else self.act_space.shape)
