@@ -119,7 +119,6 @@ defaults:
   manager_grad: reinforce
   manager_actent: 0.5
   adver_impl: squared
-  adver_reg: 0.1
   manager_delta: False
   goal_kl: True
   is_manager: False

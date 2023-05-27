@@ -50,8 +50,6 @@ class Hierarchy(tfutils.Module):
             self.expl_reward = expl.Disag(wm, act_space, config)
         elif self.config.expl_rew == 'adver':
             self.expl_reward = self.elbo_reward
-        elif self.config.expl_rew == 'adver_reg':
-            self.expl_reward = self.elbo_reward_regularised
         else:
             raise NotImplementedError(self.config.expl_rew)
         if config.explorer:
@@ -436,31 +434,6 @@ class Hierarchy(tfutils.Module):
             return (kl - ll / self.kl.scale())[1:]
         elif self.config.adver_impl == 'elbo_unscaled':
             return (kl - ll)[1:]
-        raise NotImplementedError(self.config.adver_impl)
-
-    def elbo_reward_regularised(self, traj):
-        feat = self.feat(traj).astype(tf.float32)
-        context = tf.repeat(feat[0][None], 1 + self.config.imag_horizon, 0)
-        enc = self.enc({'goal': feat, 'context': context})
-        dec = self.dec({'skill': enc.sample(), 'context': context})
-        ll = dec.log_prob(feat)
-        kl = tfd.kl_divergence(enc, self.prior)
-        print("Decoder", dec)
-        print("Context: ", context)
-        print("Feat: ", feat)
-        # Add regularisation term, critic value of decoded goal
-        # expl_critic = tf.stop_gradient(self.manager.critics['expl'](traj))
-        expl_critic = self.manager.critics['expl']({'goal': dec.mode()})
-        alpha = self.config.adver_reg  # Regularisation weight
-        if self.config.adver_impl == 'abs':
-            out = tf.abs(dec.mode() - feat).mean(-1)[1:]
-        elif self.config.adver_impl == 'squared':
-            out = ((dec.mode() - feat)**2).mean(-1)[1:]
-        elif self.config.adver_impl == 'elbo_scaled':
-            out = (kl - ll / self.kl.scale())[1:]
-        elif self.config.adver_impl == 'elbo_unscaled':
-            out = (kl - ll)[1:]
-        return out + alpha * expl_critic.mean()
         raise NotImplementedError(self.config.adver_impl)
 
     def split_traj(self, traj):
