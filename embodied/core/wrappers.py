@@ -11,31 +11,31 @@ from . import space as spacelib
 
 class TimeLimit(base.Wrapper):
 
-    def __init__(self, env, duration, reset=True):
-        super().__init__(env)
-        self._duration = duration
-        self._reset = reset
-        self._step = 0
-        self._done = False
+  def __init__(self, env, duration, reset=True):
+    super().__init__(env)
+    self._duration = duration
+    self._reset = reset
+    self._step = 0
+    self._done = False
 
-    def step(self, action):
-        if self._done:
-            self._step = 0
-            self._done = False
-            if self._reset:
-                action.update(reset=True)
-                return self.env.step(action)
-            else:
-                action.update(reset=False)
-                obs = self.env.step(action)
-                obs['is_first'] = True
-                return obs
-        self._step += 1
+  def step(self, action):
+    if action['reset'] or self._done:
+      self._step = 0
+      self._done = False
+      if self._reset:
+        action.update(reset=True)
+        return self.env.step(action)
+      else:
+        action.update(reset=False)
         obs = self.env.step(action)
-        if self._duration and self._step >= self._duration:
-            obs['is_last'] = True
-        self._done = obs['is_last']
+        obs['is_first'] = True
         return obs
+    self._step += 1
+    obs = self.env.step(action)
+    if self._duration and self._step >= self._duration:
+      obs['is_last'] = True
+    self._done = obs['is_last']
+    return obs
 
 
 class ActionRepeat(base.Wrapper):
