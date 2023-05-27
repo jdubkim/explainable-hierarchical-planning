@@ -193,12 +193,14 @@ class WandbOutput(TensorBoardOutput):
     def __init__(self, logdir, config, fps=2, parallel=True):
         super().__init__(logdir, fps, parallel)
         self.config = config
+        env_name = config['task'].split('_')[-1]
+        self.project_name = f'EHP-{env_name}'
     
     def _write(self, summaries):
         import wandb
         if not self._writer:
             self._writer = wandb.init(
-                dir=self._logdir, config=self.config, project='director', job_type='logging')
+                dir=self._logdir, config=self.config, project=self.project_name, job_type='logging')
         for step, name, value in summaries:
             if len(value.shape) == 0:
                 self._writer.log({name: value}, step=step)
