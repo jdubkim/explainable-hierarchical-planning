@@ -123,7 +123,7 @@ defaults:
   goal_kl: True
   is_manager: False
   goal_regularised: False
-  goal_regularisation_weight: 0.1
+  goal_regularisation_weight: 0.001
 
   # Exploration
   expl_rewards: {extr: 0.0, disag: 0.0, vae: 0.0, ctrl: 0.0, pbe: 0.0}
@@ -190,6 +190,7 @@ minigrid_grid:
   slow_target: False
 
 minigridImage:
+  env: {length: 100}
   task: minigridImage_Empty-6x6
   encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 3, mlp_units: 256, cnn_depth: 64}
   decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 3, mlp_units: 256, cnn_depth: 64}
@@ -206,6 +207,7 @@ minigridImage:
   expl_enc: {layers: 3, units: 256}
   expl_dec: {layers: 3, units: 256}
   .*\.lr: 3e-4
+  replay_size: 1e5
 
   # HRL
   env_skill_duration: 4
@@ -216,7 +218,7 @@ minigridImage:
   replay_chunk: 16
 
   train:
-    steps: 2e5
+    steps: 5e5
     eval_every: 1e3
     train_fill: 1e3
     eval_fill: 1e3
