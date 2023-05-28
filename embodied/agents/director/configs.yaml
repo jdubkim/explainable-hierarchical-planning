@@ -122,7 +122,7 @@ defaults:
   manager_delta: False
   goal_kl: True
   is_manager: False
-  goal_regularised: False
+  goal_regularised: True
   goal_regularisation_weight: 0.001
 
   # Exploration
@@ -190,7 +190,6 @@ minigrid_grid:
   slow_target: False
 
 minigridImage:
-  env: {length: 100}
   task: minigridImage_Empty-6x6
   encoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 3, mlp_units: 256, cnn_depth: 64}
   decoder: {mlp_keys: '$^', cnn_keys: 'image', mlp_layers: 3, mlp_units: 256, cnn_depth: 64}

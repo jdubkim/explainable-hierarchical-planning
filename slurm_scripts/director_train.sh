@@ -3,7 +3,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jk3417
 #SBATCH --output=/vol/bitbucket/jk3417/explainable-mbhrl/slurm_outputs/director_result_%j.out
-#SBATCH --partition=gpgpuB
+#SBATCH --partition=gpgpuB,gpgpuC
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
 
@@ -20,7 +20,8 @@ cp /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/configs.yaml
 echo "Using config: $1."
 echo "Running task: $2."
 echo "Using logdir: $logdir."
-srun python /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py --logdir /vol/bitbucket/jk3417/explainable-mbhrl/logdir/$logdir --configs $1 --task $2
+srun python /vol/bitbucket/jk3417/explainable-mbhrl/embodied/agents/director/train.py --logdir /vol/bitbucket/jk3417/explainable-mbhrl/logdir/$logdir --configs $1 --task $2 $3
 
 # Param 1: config (e.g.  dmlab, atari, crafter, dmc_vision, dmc_proprio, pinpad, loconav)
 # Param 2: task (e.g. dmc_walker_walk)
+# Param 3: Rest of commands (e.g. additional configs: --goal_regularised True)
