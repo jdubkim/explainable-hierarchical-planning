@@ -189,6 +189,42 @@ class TensorBoardOutput(AsyncOutput):
       tf.summary.image(name, video, step)
 
 
+class WandbOutput(TensorBoardOutput):
+    def __init__(self, logdir, config, fps=2, parallel=True):
+        super().__init__(logdir, fps, parallel)
+        self.config = config
+        env_name = config['task'].split('_')[-1]
+        self.project_name = f'EHP-{env_name}'
+    
+    def _write(self, summaries):
+        import wandb
+        if not self._writer:
+            self._writer = wandb.init(
+                dir=self._logdir, config=self.config, project=self.project_name, job_type='logging')
+        for step, name, value in summaries:
+            if len(value.shape) == 0:
+                self._writer.log({name: value}, step=step)
+            elif len(value.shape) == 2:
+                self._writer.log({name: wandb.Image(value)}, step=step)
+            elif len(value.shape) == 3:
+                self._writer.log({name: wandb.Image(value)}, step=step)
+            elif len(value.shape) == 4:
+                self._video_summary(name, value, step)
+    
+    def _video_summary(self, name, video, step):
+        import wandb
+        if np.issubdtype(video.dtype, np.floating):
+            video = np.clip(255 * video, 0, 255).astype(np.uint8)
+        try:
+            T, H, W, C = video.shape
+            # Change to T, C, H, W
+            video = np.transpose(video, (0, 3, 1, 2))
+            self._writer.log({name: wandb.Video(video, fps=self._fps)}, step=step)
+        except (IOError, OSError) as e:
+            print('GIF summaries require ffmpeg in $PATH.', e)
+            self._writer.log({name: video}, step=step)
+
+
 class MlflowOutput:
 
   def __init__(self, run_name=None, resume_id=None, params={}, prefix=''):

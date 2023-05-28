@@ -13,6 +13,7 @@ defaults:
   replay_consec: {sync: 0}
   replay_prio: {prio_starts: 0.0, prio_ends: 1.0, sync: 0, fraction: 0.1, softmax: False, temp: 1.0, constant: 0.0, exponent: 0.5}
   tf: {jit: True, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
+  wandb: True
   eval_dir: ''
   filter: '.*'
   tbtt: 0
@@ -118,9 +119,11 @@ defaults:
   manager_grad: reinforce
   manager_actent: 0.5
   adver_impl: squared
-  adver_reg: 0.1
   manager_delta: False
   goal_kl: True
+  is_manager: False
+  goal_regularised: True
+  goal_regularisation_weight: 0.001
 
   # Exploration
   expl_rewards: {extr: 0.0, disag: 0.0, vae: 0.0, ctrl: 0.0, pbe: 0.0}
@@ -203,6 +206,7 @@ minigridImage:
   expl_enc: {layers: 3, units: 256}
   expl_dec: {layers: 3, units: 256}
   .*\.lr: 3e-4
+  replay_size: 1e5
 
   # HRL
   env_skill_duration: 4
@@ -210,9 +214,10 @@ minigridImage:
   skill_shape: [4, 4]
   worker_report_horizon: 16
   imag_horizon: 8
+  replay_chunk: 16
 
   train:
-    steps: 2e5
+    steps: 5e5
     eval_every: 1e3
     train_fill: 1e3
     eval_fill: 1e3

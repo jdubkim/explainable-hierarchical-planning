@@ -55,10 +55,12 @@ class MiniGridImage(embodied.Env):
         else:
             spaces = {self._act_key: self._env.action_space}
         spaces = {k: self._convert(v) for k, v in spaces.items()}
+        # Add a reset action.
+        spaces['reset'] = embodied.Space(bool)
         return spaces
 
     def step(self, action):
-        if self._done:
+        if action['reset'] or self._done:
             self._done = False
             obs = self._env.reset()
             return self._obs(obs, 0.0, is_first=True)
