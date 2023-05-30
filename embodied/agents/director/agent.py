@@ -381,12 +381,6 @@ class ImagActorCritic(tfutils.Module):
     else:
       raise NotImplementedError(self.grad)
 
-    # print("Manager" if self.config.is_manager else "Worker")
-    # print("Trajectory keys...", traj.keys())
-    # if traj.get('skill') is not None:
-    #     print("skill shape: ", traj['skill'].shape)
-    # print("Goal shape: ", traj['goal'].shape)
-    # print("Loss shape: ", loss.shape)
     # Regularise the goal prediction loss using critics
     if self.config.is_manager and self.config.goal_regularised:
       goal_loss = self.critics["expl"].score(traj, self.actor)[1:]
