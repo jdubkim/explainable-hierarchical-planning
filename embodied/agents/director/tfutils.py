@@ -3,8 +3,8 @@ import logging
 import os
 import re
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-logging.getLogger().setLevel('ERROR')
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+logging.getLogger().setLevel("ERROR")
 
 import numpy as np
 import tensorflow as tf
@@ -40,6 +40,8 @@ def tensor(value):
   if isinstance(value, values.PerReplica):
     return value
   return tf.convert_to_tensor(value)
+
+
 tf.tensor = tensor
 
 
@@ -95,15 +97,14 @@ def action_noise(action, amount, act_space):
     return tf.clip_by_value(tfd.Normal(action, amount).sample(), -1, 1)
 
 
-def lambda_return(
-    reward, value, pcont, bootstrap, lambda_, axis):
+def lambda_return(reward, value, pcont, bootstrap, lambda_, axis):
   # Setting lambda=1 gives a discounted Monte Carlo return.
   # Setting lambda=0 gives a fixed 1-step return.
   assert reward.shape.ndims == value.shape.ndims, (reward.shape, value.shape)
   if isinstance(pcont, (int, float)):
     pcont = pcont * tf.ones_like(reward)
   dims = list(range(reward.shape.ndims))
-  dims = [axis] + dims[1:axis] + [0] + dims[axis + 1:]
+  dims = [axis] + dims[1:axis] + [0] + dims[axis + 1 :]
   if axis != 0:
     reward = tf.transpose(reward, dims)
     value = tf.transpose(value, dims)
@@ -114,7 +115,11 @@ def lambda_return(
   inputs = reward + pcont * next_values * (1 - lambda_)
   returns = scan(
       lambda agg, cur: cur[0] + cur[1] * lambda_ * agg,
-      (inputs, pcont), bootstrap, static=True, reverse=True)
+      (inputs, pcont),
+      bootstrap,
+      static=True,
+      reverse=True,
+  )
   if axis != 0:
     returns = tf.transpose(returns, dims)
   return returns
@@ -126,21 +131,21 @@ class Module(tf.Module):
     values = tf.nest.map_structure(lambda x: x.numpy(), self.variables)
     amount = len(tf.nest.flatten(values))
     count = int(sum(np.prod(x.shape) for x in tf.nest.flatten(values)))
-    print(f'Saving module with {amount} tensors and {count} parameters.')
+    print(f"Saving module with {amount} tensors and {count} parameters.")
     return values
 
   def load(self, values):
     amount = len(tf.nest.flatten(values))
     count = int(sum(np.prod(x.shape) for x in tf.nest.flatten(values)))
-    print(f'Loading module with {amount} tensors and {count} parameters.')
+    print(f"Loading module with {amount} tensors and {count} parameters.")
     tf.nest.map_structure(lambda x, y: x.assign(y), self.variables, values)
 
   def get(self, name, ctor, *args, **kwargs):
-    if not hasattr(self, '_modules'):
+    if not hasattr(self, "_modules"):
       self._modules = {}
     if name not in self._modules:
-      if 'name' in inspect.signature(ctor).parameters:
-        kwargs['name'] = name
+      if "name" in inspect.signature(ctor).parameters:
+        kwargs["name"] = name
       self._modules[name] = ctor(*args, **kwargs)
     return self._modules[name]
 
@@ -148,8 +153,16 @@ class Module(tf.Module):
 class Optimizer(Module):
 
   def __init__(
-      self, name, lr, opt='adam', eps=1e-5, clip=0.0, warmup=0, wd=0.0,
-      wd_pattern='kernel'):
+      self,
+      name,
+      lr,
+      opt="adam",
+      eps=1e-5,
+      clip=0.0,
+      warmup=0,
+      wd=0.0,
+      wd_pattern="kernel",
+  ):
     assert 0 <= wd < 1
     assert not clip or 1 <= clip
     self._name = name
@@ -161,13 +174,14 @@ class Optimizer(Module):
     self._lr = lr
     if warmup:
       self._lr = lambda: lr * tf.clip_by_value(
-          self._updates.astype(tf.float32) / warmup, 0.0, 1.0)
+          self._updates.astype(tf.float32) / warmup, 0.0, 1.0
+      )
     self._opt = {
-        'adam': lambda: tf.optimizers.Adam(self._lr, epsilon=eps),
-        'sgd': lambda: tf.optimizers.SGD(self._lr),
-        'momentum': lambda: tf.optimizers.SGD(self._lr, 0.9),
+        "adam": lambda: tf.optimizers.Adam(self._lr, epsilon=eps),
+        "sgd": lambda: tf.optimizers.SGD(self._lr),
+        "momentum": lambda: tf.optimizers.SGD(self._lr, 0.9),
     }[opt]()
-    self._scaling = (prec.global_policy().compute_dtype == tf.float16)
+    self._scaling = prec.global_policy().compute_dtype == tf.float16
     if self._scaling:
       self._grad_scale = tf.Variable(1e4, trainable=False, dtype=tf.float32)
       self._fine_steps = tf.Variable(0, trainable=False, dtype=tf.int64)
@@ -183,15 +197,14 @@ class Optimizer(Module):
     metrics = {}
 
     # Find variables.
-    modules = modules if hasattr(modules, '__len__') else (modules,)
-    varibs = tf.nest.flatten([
-        module.trainable_variables for module in modules])
+    modules = modules if hasattr(modules, "__len__") else (modules,)
+    varibs = tf.nest.flatten([module.trainable_variables for module in modules])
     count = sum(int(np.prod(x.shape)) for x in varibs)
-    self._once and print(f'Found {count} {self._name} parameters.')
+    self._once and print(f"Found {count} {self._name} parameters.")
 
     # Check loss.
-    tf.debugging.check_numerics(loss, self._name + '_loss')
-    metrics[f'{self._name}_loss'] = loss
+    tf.debugging.check_numerics(loss, self._name + "_loss")
+    metrics[f"{self._name}_loss"] = loss
 
     # Compute scaled gradient.
     if self._scaling:
@@ -200,29 +213,33 @@ class Optimizer(Module):
     grads = tape.gradient(loss, varibs)
     for var, grad in zip(varibs, grads):
       if grad is None:
-        raise RuntimeError(
-            f'{self._name} optimizer found no gradient for {var.name}.')
+        raise RuntimeError(f"{self._name} optimizer found no gradient for {var.name}.")
 
     # Distributed sync.
     if tf.distribute.has_strategy():
       context = tf.distribute.get_replica_context()
-      grads = context.all_reduce('mean', grads)
+      grads = context.all_reduce("mean", grads)
 
     if self._scaling:
       grads = tf.nest.map_structure(lambda x: x / self._grad_scale, grads)
-      overflow = ~tf.reduce_all([
-          tf.math.is_finite(x).all() for x in tf.nest.flatten(grads)])
-      metrics[f'{self._name}_grad_scale'] = self._grad_scale
-      metrics[f'{self._name}_grad_overflow'] = overflow.astype(tf.float32)
-      keep = (~overflow & (self._fine_steps < 1000))
-      incr = (~overflow & (self._fine_steps >= 1000))
+      overflow = ~tf.reduce_all(
+          [tf.math.is_finite(x).all() for x in tf.nest.flatten(grads)]
+      )
+      metrics[f"{self._name}_grad_scale"] = self._grad_scale
+      metrics[f"{self._name}_grad_overflow"] = overflow.astype(tf.float32)
+      keep = ~overflow & (self._fine_steps < 1000)
+      incr = ~overflow & (self._fine_steps >= 1000)
       decr = overflow
       self._fine_steps.assign(keep.astype(tf.int64) * (self._fine_steps + 1))
-      self._grad_scale.assign(tf.clip_by_value(
-          keep.astype(tf.float32) * self._grad_scale +
-          incr.astype(tf.float32) * self._grad_scale * 2 +
-          decr.astype(tf.float32) * self._grad_scale / 2,
-          1e-4, 1e4))
+      self._grad_scale.assign(
+          tf.clip_by_value(
+              keep.astype(tf.float32) * self._grad_scale
+              + incr.astype(tf.float32) * self._grad_scale * 2
+              + decr.astype(tf.float32) * self._grad_scale / 2,
+              1e-4,
+              1e4,
+          )
+      )
     else:
       overflow = False
 
@@ -233,8 +250,8 @@ class Optimizer(Module):
     if self._scaling:
       norm = tf.where(tf.math.is_finite(norm), norm, np.nan)
     else:
-      tf.debugging.check_numerics(norm, self._name + '_norm')
-    metrics[f'{self._name}_grad_norm'] = norm
+      tf.debugging.check_numerics(norm, self._name + "_norm")
+    metrics[f"{self._name}_grad_norm"] = norm
 
     # Weight decay.
     if self._wd:
@@ -244,37 +261,37 @@ class Optimizer(Module):
     # Apply gradients.
     if ~overflow:
       self._opt.apply_gradients(
-          zip(grads, varibs),
-          experimental_aggregate_gradients=False)
+          zip(grads, varibs), experimental_aggregate_gradients=False
+      )
       self._updates.assign_add(1)
-    metrics[f'{self._name}_grad_steps'] = self._updates
+    metrics[f"{self._name}_grad_steps"] = self._updates
 
     self._once = False
     return metrics
 
   def _apply_weight_decay(self, varibs):
     lr = self._lr() if callable(self._lr) else self._lr
-    log = (self._wd_pattern != r'.*') and self._once
+    log = (self._wd_pattern != r".*") and self._once
     if log:
       print(f"Optimizer applied weight decay to {self._name} variables:")
     included, excluded = [], []
     for var in sorted(varibs, key=lambda x: x.name):
-      if re.search(self._wd_pattern, self._name + '/' + var.name):
+      if re.search(self._wd_pattern, self._name + "/" + var.name):
         var.assign((1 - self._wd * lr) * var)
         included.append(var.name)
       else:
         excluded.append(var.name)
     if log:
       for name in included:
-        print(f'[x] {name}')
+        print(f"[x] {name}")
       for name in excluded:
-        print(f'[ ] {name}')
-      print('')
+        print(f"[ ] {name}")
+      print("")
 
 
 class MSEDist(tfd.Distribution):
 
-  def __init__(self, pred, dims, agg='sum'):
+  def __init__(self, pred, dims, agg="sum"):
     super().__init__(pred.dtype, tfd.FULLY_REPARAMETERIZED, False, True)
     self.pred = pred
     self._dims = dims
@@ -283,13 +300,13 @@ class MSEDist(tfd.Distribution):
 
   @classmethod
   def _parameter_properties(cls, dtype, num_classes=None):
-    return {'pred': tfp.util.ParameterProperties()}
+    return {"pred": tfp.util.ParameterProperties()}
 
   def _batch_shape(self):
-    return self.pred.shape[:len(self.pred.shape) - self._dims]
+    return self.pred.shape[: len(self.pred.shape) - self._dims]
 
   def _event_shape(self):
-    return self.pred.shape[len(self.pred.shape) - self._dims:]
+    return self.pred.shape[len(self.pred.shape) - self._dims :]
 
   def mean(self):
     return self.pred
@@ -301,12 +318,11 @@ class MSEDist(tfd.Distribution):
     return tf.broadcast_to(self.pred, sample_shape + self.pred.shape)
 
   def log_prob(self, value):
-    assert len(self.pred.shape) == len(value.shape), (
-        self.pred.shape, value.shape)
-    distance = ((self.pred - value) ** 2)
-    if self._agg == 'mean':
+    assert len(self.pred.shape) == len(value.shape), (self.pred.shape, value.shape)
+    distance = (self.pred - value) ** 2
+    if self._agg == "mean":
       loss = distance.mean(self._axes)
-    elif self._agg == 'sum':
+    elif self._agg == "sum":
       loss = distance.sum(self._axes)
     else:
       raise NotImplementedError(self._agg)
@@ -321,7 +337,7 @@ class CosineDist(tfd.Distribution):
 
   @classmethod
   def _parameter_properties(cls, dtype, num_classes=None):
-    return {'pred': tfp.util.ParameterProperties()}
+    return {"pred": tfp.util.ParameterProperties()}
 
   def _batch_shape(self):
     return self.pred.shape[:-1]
@@ -339,9 +355,8 @@ class CosineDist(tfd.Distribution):
     return tf.broadcast_to(self.pred, sample_shape + self.pred.shape)
 
   def log_prob(self, value):
-    assert len(self.pred.shape) == len(value.shape), (
-        self.pred.shape, value.shape)
-    return tf.einsum('...i,...i->...', self.pred, value)
+    assert len(self.pred.shape) == len(value.shape), (self.pred.shape, value.shape)
+    return tf.einsum("...i,...i->...", self.pred, value)
 
 
 class DirDist(tfd.MultivariateNormalDiag):
@@ -353,7 +368,7 @@ class DirDist(tfd.MultivariateNormalDiag):
 
   @classmethod
   def _parameter_properties(cls, dtype, num_classes=None):
-    return {k: tfp.util.ParameterProperties() for k in ('mean', 'std')}
+    return {k: tfp.util.ParameterProperties() for k in ("mean", "std")}
 
   def _batch_shape(self):
     return self.mean.shape[:-1]
@@ -373,12 +388,12 @@ class DirDist(tfd.MultivariateNormalDiag):
 
 class SymlogDist:
 
-  def __init__(self, mode, dims, agg='sum'):
+  def __init__(self, mode, dims, agg="sum"):
     self._mode = mode
     self._dims = tuple([-x for x in range(1, dims + 1)])
     self._agg = agg
-    self.batch_shape = mode.shape[:len(mode.shape) - dims]
-    self.event_shape = mode.shape[len(mode.shape) - dims:]
+    self.batch_shape = mode.shape[: len(mode.shape) - dims]
+    self.event_shape = mode.shape[len(mode.shape) - dims :]
 
   def mode(self):
     return symexp(self._mode)
@@ -389,9 +404,9 @@ class SymlogDist:
   def log_prob(self, value):
     assert self._mode.shape == value.shape, (self._mode.shape, value.shape)
     distance = (self._mode - symlog(value)) ** 2
-    if self._agg == 'mean':
+    if self._agg == "mean":
       loss = distance.mean(self._dims)
-    elif self._agg == 'sum':
+    elif self._agg == "sum":
       loss = distance.sum(self._dims)
     else:
       raise NotImplementedError(self._agg)
@@ -405,7 +420,7 @@ class OneHotDist(tfd.OneHotCategorical):
 
   @classmethod
   def _parameter_properties(cls, dtype, num_classes=None):
-     return super()._parameter_properties(dtype)
+    return super()._parameter_properties(dtype)
 
   def sample(self, sample_shape=(), seed=None):
     if not isinstance(sample_shape, (list, tuple)):
@@ -456,8 +471,8 @@ def balance_stats(dist, target, thres):
 class AutoAdapt(Module):
 
   def __init__(
-      self, shape, impl, scale, target, min, max,
-      vel=0.1, thres=0.1, inverse=False):
+      self, shape, impl, scale, target, min, max, vel=0.1, thres=0.1, inverse=False
+  ):
     self._shape = shape
     self._impl = impl
     self._target = target
@@ -466,11 +481,11 @@ class AutoAdapt(Module):
     self._vel = vel
     self._inverse = inverse
     self._thres = thres
-    if self._impl == 'fixed':
+    if self._impl == "fixed":
       self._scale = tf.tensor(scale)
-    elif self._impl == 'mult':
+    elif self._impl == "mult":
       self._scale = tf.Variable(tf.ones(shape, tf.float32), trainable=False)
-    elif self._impl == 'prop':
+    elif self._impl == "prop":
       self._scale = tf.Variable(tf.ones(shape, tf.float32), trainable=False)
     else:
       raise NotImplementedError(self._impl)
@@ -480,16 +495,19 @@ class AutoAdapt(Module):
     scale = self.scale()
     loss = scale * (-reg if self._inverse else reg)
     metrics = {
-        'mean': reg.mean(), 'std': reg.std(),
-        'scale_mean': scale.mean(), 'scale_std': scale.std()}
+        "mean": reg.mean(),
+        "std": reg.std(),
+        "scale_mean": scale.mean(),
+        "scale_std": scale.std(),
+    }
     return loss, metrics
 
   def scale(self):
-    if self._impl == 'fixed':
+    if self._impl == "fixed":
       scale = self._scale
-    elif self._impl == 'mult':
+    elif self._impl == "mult":
       scale = self._scale
-    elif self._impl == 'prop':
+    elif self._impl == "prop":
       scale = self._scale
     else:
       raise NotImplementedError(self._impl)
@@ -497,33 +515,34 @@ class AutoAdapt(Module):
 
   def update(self, reg):
     avg = reg.mean(list(range(len(reg.shape) - len(self._shape))))
-    if self._impl == 'fixed':
+    if self._impl == "fixed":
       pass
-    elif self._impl == 'mult':
+    elif self._impl == "mult":
       below = avg < (1 / (1 + self._thres)) * self._target
       above = avg > (1 + self._thres) * self._target
       if self._inverse:
         below, above = above, below
       inside = ~below & ~above
       adjusted = (
-          above.astype(tf.float32) * self._scale * (1 + self._vel) +
-          below.astype(tf.float32) * self._scale / (1 + self._vel) +
-          inside.astype(tf.float32) * self._scale)
+          above.astype(tf.float32) * self._scale * (1 + self._vel)
+          + below.astype(tf.float32) * self._scale / (1 + self._vel)
+          + inside.astype(tf.float32) * self._scale
+      )
       self._scale.assign(tf.clip_by_value(adjusted, self._min, self._max))
-    elif self._impl == 'prop':
+    elif self._impl == "prop":
       direction = avg - self._target
       if self._inverse:
         direction = -direction
-      self._scale.assign(tf.clip_by_value(
-          self._scale + self._vel * direction, self._min, self._max))
+      self._scale.assign(
+          tf.clip_by_value(self._scale + self._vel * direction, self._min, self._max)
+      )
     else:
       raise NotImplementedError(self._impl)
 
 
 class Normalize:
 
-  def __init__(
-      self, impl='mean_std', decay=0.99, max=1e8, vareps=0.0, stdeps=0.0):
+  def __init__(self, impl="mean_std", decay=0.99, max=1e8, vareps=0.0, stdeps=0.0):
     self._impl = impl
     self._decay = decay
     self._max = max
@@ -542,23 +561,24 @@ class Normalize:
     m = self._decay
     self._step.assign_add(1)
     self._mean.assign(m * self._mean + (1 - m) * x.mean())
-    self._sqrs.assign(m * self._sqrs + (1 - m) * (x ** 2).mean())
+    self._sqrs.assign(m * self._sqrs + (1 - m) * (x**2).mean())
 
   def transform(self, values):
     correction = 1 - self._decay ** self._step.astype(tf.float64)
     mean = self._mean / correction
-    var = (self._sqrs / correction) - mean ** 2
+    var = (self._sqrs / correction) - mean**2
     if self._max > 0.0:
       scale = tf.math.rsqrt(
-          tf.maximum(var, 1 / self._max ** 2 + self._vareps) + self._stdeps)
+          tf.maximum(var, 1 / self._max**2 + self._vareps) + self._stdeps
+      )
     else:
       scale = tf.math.rsqrt(var + self._vareps) + self._stdeps
-    if self._impl == 'off':
+    if self._impl == "off":
       pass
-    elif self._impl == 'mean_std':
+    elif self._impl == "mean_std":
       values -= mean.astype(values.dtype)
       values *= scale.astype(values.dtype)
-    elif self._impl == 'std':
+    elif self._impl == "std":
       values *= scale.astype(values.dtype)
     else:
       raise NotImplementedError(self._impl)

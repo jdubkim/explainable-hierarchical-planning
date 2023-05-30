@@ -26,26 +26,24 @@ class HRLGrid(embodied.Env):
   @property
   def act_space(self):
     return {
-        'action': embodied.Space(np.int64, (), 0, len(self.moves)),
-        'reset': embodied.Space(bool),
+        "action": embodied.Space(np.int64, (), 0, len(self.moves)),
+        "reset": embodied.Space(bool),
     }
 
   @property
   def obs_space(self):
     return {
-        'image': embodied.Space(np.uint8, (64, 64, 3)),
-        'reward': embodied.Space(np.float32),
-        'is_first': embodied.Space(bool),
-        'is_last': embodied.Space(bool),
-        'is_terminal': embodied.Space(bool),
+        "image": embodied.Space(np.uint8, (64, 64, 3)),
+        "reward": embodied.Space(np.float32),
+        "is_first": embodied.Space(bool),
+        "is_last": embodied.Space(bool),
+        "is_terminal": embodied.Space(bool),
     }
 
   def step(self, action):
     w = h = self.grid
-    if self.done or action['reset']:
-      randpos = lambda: (
-          self.random.randint(1, w - 1),
-          self.random.randint(1, h - 1))
+    if self.done or action["reset"]:
+      randpos = lambda: (self.random.randint(1, w - 1), self.random.randint(1, h - 1))
       self.player = randpos()
       self.particle = randpos()
       self.goal = randpos()
@@ -57,13 +55,15 @@ class HRLGrid(embodied.Env):
     # move = self.moves.get(tuple(self.prev), (0, 0))
     particle = (
         np.clip(self.particle[0] + self.random.randint(-1, 2), 1, w - 2),
-        np.clip(self.particle[1] + self.random.randint(-1, 2), 1, h - 2))
+        np.clip(self.particle[1] + self.random.randint(-1, 2), 1, h - 2),
+    )
     if particle != self.player:
       self.particle = particle
-    move = self.moves[action['action']]
+    move = self.moves[action["action"]]
     player = (
         np.clip(self.player[0] + move[0], 1, w - 2),
-        np.clip(self.player[1] + move[1], 1, h - 2))
+        np.clip(self.player[1] + move[1], 1, h - 2),
+    )
     if player != self.particle:
       self.player = player
     reward = float(self.player == self.goal)
@@ -78,14 +78,18 @@ class HRLGrid(embodied.Env):
     image[self.player] = (0, 0, 192)
     image[self.particle] = (192, 0, 0)
     image = np.repeat(np.repeat(image, 64 // w, 0), 64 // h, 1)
-    image[:+64 // w, :] = [192, 192, 192]
-    image[-64 // w:, :] = [192, 192, 192]
-    image[:, :+64 // h] = [192, 192, 192]
-    image[:, -64 // h:] = [192, 192, 192]
+    image[: +64 // w, :] = [192, 192, 192]
+    image[-64 // w :, :] = [192, 192, 192]
+    image[:, : +64 // h] = [192, 192, 192]
+    image[:, -64 // h :] = [192, 192, 192]
     assert image.shape == (64, 64, 3), image.shape
     return image
 
   def _obs(self, reward, is_first=False, is_last=False, is_terminal=False):
     return dict(
-        image=self.render(), reward=reward, is_first=is_first, is_last=is_last,
-        is_terminal=is_terminal)
+        image=self.render(),
+        reward=reward,
+        is_first=is_first,
+        is_last=is_last,
+        is_terminal=is_terminal,
+    )

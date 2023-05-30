@@ -16,8 +16,8 @@ class RAMStore:
 
   def stats(self):
     return {
-        'steps': self.steps,
-        'trajs': len(self.trajs),
+        "steps": self.steps,
+        "trajs": len(self.trajs),
     }
 
   def close(self):
@@ -58,8 +58,7 @@ class RAMStore:
 
 
 class DiskStore:
-  """A disk-based replay buffer.
-  """
+  """A disk-based replay buffer."""
 
   def __init__(self, directory, capacity=None, parallel=False):
     self.directory = embodied.Path(directory)
@@ -67,13 +66,13 @@ class DiskStore:
     self.capacity = capacity
     self.filenames = {}
     self.steps = 0
-    self.worker = embodied.Worker('thread' if parallel else 'none')
+    self.worker = embodied.Worker("thread" if parallel else "none")
     self.sync()
 
   def stats(self):
     return {
-        'steps': self.steps,
-        'trajs': len(self.filenames),
+        "steps": self.steps,
+        "trajs": len(self.filenames),
     }
 
   def close(self):
@@ -90,7 +89,7 @@ class DiskStore:
 
   def __getitem__(self, key):
     filename = embodied.Path(self.filenames[key])
-    with filename.open('rb') as f:
+    with filename.open("rb") as f:
       data = np.load(f)
       data = {k: data[k] for k in data.keys()}
     return data
@@ -111,7 +110,7 @@ class DiskStore:
     self.steps -= length
 
   def sync(self):
-    filenames = sorted(self.directory.glob('*.npz'))
+    filenames = sorted(self.directory.glob("*.npz"))
     selected = {}
     steps = 0
     for filename in reversed(filenames):
@@ -122,7 +121,7 @@ class DiskStore:
       steps += length
     self.filenames = dict(reversed(list(selected.items())))
     self.steps = steps
-    print(f'Synced last {len(selected)}/{len(filenames)} trajectories.')
+    print(f"Synced last {len(selected)}/{len(filenames)} trajectories.")
 
   @staticmethod
   def _save(filename, traj):
@@ -131,9 +130,9 @@ class DiskStore:
     with io.BytesIO() as stream:
       np.savez_compressed(stream, **traj)
       stream.seek(0)
-      filename.write(stream.read(), mode='wb')
+      filename.write(stream.read(), mode="wb")
     end = timelib.time()
-    print(f'Saved episode: {filename.name}. Took {end - start:.2f}s.')
+    print(f"Saved episode: {filename.name}. Took {end - start:.2f}s.")
 
   def _enforce_limit(self):
     if not self.capacity:
@@ -143,23 +142,21 @@ class DiskStore:
       del self[next(iter(self.filenames.keys()))]
 
   def _format(self, key, traj):
-    time = timelib.strftime('%Y%m%dT%H%M%S', timelib.gmtime(timelib.time()))
+    time = timelib.strftime("%Y%m%dT%H%M%S", timelib.gmtime(timelib.time()))
     length = len(next(iter(traj.values())))
-    reward = str(int(traj['reward'].sum())).replace('-', 'm')
-    return self.directory / f'{time}-{key}-len{length}-rew{reward}.npz'
+    reward = str(int(traj["reward"].sum())).replace("-", "m")
+    return self.directory / f"{time}-{key}-len{length}-rew{reward}.npz"
 
   def _parse(self, filename):
-    time, key, length, reward = filename.stem.split('-')
-    time = timelib.mktime(timelib.strptime(time,
-                                           '%Y%m%dT%H%M%S')) - timelib.timezone
-    length = int(length.strip('len'))
-    reward = int(reward.strip('rew').replace('m', '-'))
+    time, key, length, reward = filename.stem.split("-")
+    time = timelib.mktime(timelib.strptime(time, "%Y%m%dT%H%M%S")) - timelib.timezone
+    length = int(length.strip("len"))
+    reward = int(reward.strip("rew").replace("m", "-"))
     return time, key, length, reward
 
 
 class CkptRAMStore:
-  """RAM buffer that can sync with trajectories on disk.
-  """
+  """RAM buffer that can sync with trajectories on disk."""
 
   def __init__(self, directory, capacity=None, parallel=False):
     self.disk_store = DiskStore(directory, capacity, parallel)
@@ -211,13 +208,13 @@ class Stats:
   def stats(self):
     return {
         **self.store.stats(),
-        'episodes': self.episodes,
-        'ep_length': self.episodes and self.store.steps / self.episodes,
-        'ep_return': self.episodes and self.reward / self.episodes,
+        "episodes": self.episodes,
+        "ep_length": self.episodes and self.store.steps / self.episodes,
+        "ep_return": self.episodes and self.reward / self.episodes,
     }
 
   def __getattr__(self, name):
-    if name.startswith('__'):
+    if name.startswith("__"):
       raise AttributeError(name)
     try:
       return getattr(self.store, name)
@@ -235,29 +232,27 @@ class Stats:
 
   def __setitem__(self, key, traj):
     self.store[key] = traj
-    self.reward += traj['reward'].sum()
-    self.steps += len(traj['is_first'])
-    self.episodes += traj['is_first'].sum()
+    self.reward += traj["reward"].sum()
+    self.steps += len(traj["is_first"])
+    self.episodes += traj["is_first"].sum()
 
   def __delitem__(self, key):
     traj = self.store[key]
     del self.store[key]
-    self.reward -= traj['reward'].sum()
-    self.steps -= len(traj['is_first'])
-    self.episodes -= traj['is_first'].sum()
+    self.reward -= traj["reward"].sum()
+    self.steps -= len(traj["is_first"])
+    self.episodes -= traj["is_first"].sum()
 
 
 class StoreServer:
 
   def __init__(self, store, port):
     self.store = store
-    self.thread = threading.Thread(target=self._server,
-                                   args=(port,),
-                                   daemon=True)
+    self.thread = threading.Thread(target=self._server, args=(port,), daemon=True)
     self.thread.start()
 
   def __getattr__(self, name):
-    if name.startswith('__'):
+    if name.startswith("__"):
       raise AttributeError(name)
     try:
       return getattr(self.store, name)
@@ -279,18 +274,19 @@ class StoreServer:
   def _server(self, port):
     import zmq
     import pickle
-    print(f'Replay server listening on *:{port}')
+
+    print(f"Replay server listening on *:{port}")
     socket = zmq.Context().socket(zmq.REP)
-    socket.bind(f'tcp://*:{port}')
+    socket.bind(f"tcp://*:{port}")
     while True:
       method, args = pickle.loads(socket.recv())
       ret = None
-      if method == 'keys':
+      if method == "keys":
         ret = self.keys()
-      elif method == '__getitem__':
-        key, = args
+      elif method == "__getitem__":
+        (key,) = args
         ret = self[key]
-      elif method == '__setitem__':
+      elif method == "__setitem__":
         key, traj = args
         self[key] = traj
       else:
@@ -302,10 +298,11 @@ class StoreClient:
 
   def __init__(self, address):
     import zmq
+
     self.address = address
-    print(f'Using remote store via ZMQ on {address}')
+    print(f"Using remote store via ZMQ on {address}")
     self.socket = zmq.Context().socket(zmq.REQ)
-    self.socket.connect(f'tcp://{address}')
+    self.socket.connect(f"tcp://{address}")
     self.pending = False
     self.once = True
 
@@ -320,21 +317,21 @@ class StoreClient:
     pass
 
   def keys(self):
-    self._call('keys')
+    self._call("keys")
     return self._result()
 
   def __len__(self):
-    raise NotImplementedError('Use store.keys() to cause fewer remote calls.')
+    raise NotImplementedError("Use store.keys() to cause fewer remote calls.")
 
   def __contains__(self, key):
-    raise NotImplementedError('Use store.keys() to cause fewer remote calls.')
+    raise NotImplementedError("Use store.keys() to cause fewer remote calls.")
 
   def __getitem__(self, key):
-    self._call('__getitem__', key)
+    self._call("__getitem__", key)
     return self._result()
 
   def __setitem__(self, key, traj):
-    self._call('__setitem__', key, traj)
+    self._call("__setitem__", key, traj)
 
   def sync(self):
     pass
@@ -351,9 +348,9 @@ class StoreClient:
     assert self.pending
     # TODO: If the server is unavailable or the address is incorrect, it will
     # just hang here, not raising any error earlier during send.
-    self.once and print(f'Waiting for response from {self.address}...')
+    self.once and print(f"Waiting for response from {self.address}...")
     ret = pickle.loads(self.socket.recv())
-    self.once and print(f'Connection to {self.address} successful!')
+    self.once and print(f"Connection to {self.address} successful!")
     self.once = False
     self.pending = False
     return ret

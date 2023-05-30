@@ -12,7 +12,7 @@ class Flags:
   def parse(self, argv=None, help_exists=True):
     parsed, remaining = self.parse_known(argv)
     for flag in remaining:
-      if flag.startswith('--'):
+      if flag.startswith("--"):
         raise ValueError(f"Flag '{flag}' did not match any config keys.")
     assert not remaining, remaining
     return parsed
@@ -20,21 +20,21 @@ class Flags:
   def parse_known(self, argv=None, help_exists=False):
     if argv is None:
       argv = sys.argv[1:]
-    if '--help' in argv:
-      print('\nHelp:')
-      lines = str(self._config).split('\n')[2:]
-      print('\n'.join('--' + re.sub(r'[:,\[\]]', '', x) for x in lines))
+    if "--help" in argv:
+      print("\nHelp:")
+      lines = str(self._config).split("\n")[2:]
+      print("\n".join("--" + re.sub(r"[:,\[\]]", "", x) for x in lines))
       help_exists and sys.exit()
     parsed = {}
     remaining = []
     key = None
     vals = None
     for arg in argv:
-      if arg.startswith('--'):
+      if arg.startswith("--"):
         if key:
           self._submit_entry(key, vals, parsed, remaining)
-        if '=' in arg:
-          key, val = arg.split('=', 1)
+        if "=" in arg:
+          key, val = arg.split("=", 1)
           vals = [val]
         else:
           key, vals = arg, []
@@ -51,10 +51,10 @@ class Flags:
     if not key and not vals:
       return
     if not key:
-      vals = ', '.join(f"'{x}'" for x in vals)
+      vals = ", ".join(f"'{x}'" for x in vals)
       raise ValueError(f"Values {vals} were not preceeded by any flag.")
-    name = key[len('--'):]
-    if '=' in name:
+    name = key[len("--") :]
+    if "=" in name:
       remaining.extend([key] + vals)
       return
     if self._config.IS_PATTERN.fullmatch(name):
@@ -75,8 +75,8 @@ class Flags:
   def _parse_flag_value(self, default, value, key):
     value = value if isinstance(value, (tuple, list)) else (value,)
     if isinstance(default, (tuple, list)):
-      if len(value) == 1 and ',' in value[0]:
-        value = value[0].split(',')
+      if len(value) == 1 and "," in value[0]:
+        value = value[0].split(",")
       return tuple(self._parse_flag_value(default[0], [x], key) for x in value)
     assert len(value) == 1, value
     value = str(value[0])
@@ -84,7 +84,7 @@ class Flags:
       return value
     if isinstance(default, bool):
       try:
-        return bool(['False', 'True'].index(value))
+        return bool(["False", "True"].index(value))
       except ValueError:
         message = f"Expected bool but got '{value}' for key '{key}'."
         raise TypeError(message)

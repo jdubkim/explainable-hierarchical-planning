@@ -12,8 +12,18 @@ from . import prios
 class Prioritized(embodied.Replay):
 
   def __init__(
-      self, store, chunk=8, prio_starts=0.0, prio_ends=1.0, sync=0,
-      fraction=0.1, softmax=False, temp=1.0, constant=0.0, exponent=0.5):
+      self,
+      store,
+      chunk=8,
+      prio_starts=0.0,
+      prio_ends=1.0,
+      sync=0,
+      fraction=0.1,
+      softmax=False,
+      temp=1.0,
+      constant=0.0,
+      exponent=0.5,
+  ):
     # TODO: We're currently not removing old episodes from the priority table
     # when the store is reaching its capacity.
     self.store = store
@@ -21,15 +31,16 @@ class Prioritized(embodied.Replay):
     self.prio_starts = prio_starts
     self.prio_ends = prio_ends
     self.random = np.random.RandomState(seed=0)
-    self.ongoing = collections.defaultdict(
-        lambda: collections.defaultdict(list))
+    self.ongoing = collections.defaultdict(lambda: collections.defaultdict(list))
+
     def aggregate(prios):
       if softmax:
         prios = np.exp(prios / temp)
         prios = np.maximum(prios + constant, 0)
       else:
         prios = np.abs(prios) ** exponent
-      return np.convolve(prios, np.ones(chunk), 'valid')
+      return np.convolve(prios, np.ones(chunk), "valid")
+
     self.prios = prios.Priorities(aggregate, fraction, prio_starts, prio_ends)
     self.handed_out_keys = set()
     if softmax:
@@ -39,8 +50,7 @@ class Prioritized(embodied.Replay):
     if sync:
       self.last_scan = time.time()
       # TODO: How can we propagate exceptions from this worker thread?
-      self.thread = threading.Thread(
-          target=self._sync, args=(sync,), daemon=True)
+      self.thread = threading.Thread(target=self._sync, args=(sync,), daemon=True)
       self.thread.start()
 
   def __len__(self):
@@ -48,24 +58,24 @@ class Prioritized(embodied.Replay):
 
   @property
   def stats(self):
-    metrics = {f'replay_{k}': v for k, v in self.store.stats().items()}
+    metrics = {f"replay_{k}": v for k, v in self.store.stats().items()}
     metrics.update(self.prios.stats)
     return metrics
 
   def add(self, tran, worker=0):
-    if tran['is_first']:
+    if tran["is_first"]:
       self.ongoing[worker].clear()
     episode = self.ongoing[worker]
     [episode[k].append(v) for k, v in tran.items()]
-    if tran['is_last']:
+    if tran["is_last"]:
       self.add_traj(self.ongoing.pop(worker))
 
   def add_traj(self, traj):
     length = len(next(iter(traj.values())))
     if length < self.chunk:
-      print(f'Skipping short trajectory of length {length}.')
+      print(f"Skipping short trajectory of length {length}.")
       return
-    traj = {k: v for k, v in traj.items() if not k.startswith('log_')}
+    traj = {k: v for k, v in traj.items() if not k.startswith("log_")}
     traj = {k: embodied.convert(v) for k, v in traj.items()}
     key = uuid.uuid4().hex
     self.store[key] = traj
@@ -81,13 +91,13 @@ class Prioritized(embodied.Replay):
       try:
         self.prios.update(key, index, priority)
       except KeyError:
-        print('Received priorities for an episode that was already removed.')
+        print("Received priorities for an episode that was already removed.")
 
   def dataset(self):
     while True:
       traj = self._sample()
       if traj is None:
-        print('Waiting for episodes.')
+        print("Waiting for episodes.")
         time.sleep(1)
         continue
       yield traj
@@ -110,22 +120,22 @@ class Prioritized(embodied.Replay):
       upper += int(self.chunk * self.prio_ends)
     index = self.random.randint(lower, upper)
     index = np.clip(index, 0, total - self.chunk)
-    chunk = {k: traj[k][index: index + self.chunk] for k in traj.keys()}
-    chunk['is_first'] = np.zeros(len(chunk['action']), bool)
-    chunk['is_first'][0] = True
-    chunk['key'] = np.repeat(key[None], self.chunk, axis=0)
-    chunk['prob'] = np.repeat(prob[None], self.chunk, axis=0)
+    chunk = {k: traj[k][index : index + self.chunk] for k in traj.keys()}
+    chunk["is_first"] = np.zeros(len(chunk["action"]), bool)
+    chunk["is_first"][0] = True
+    chunk["key"] = np.repeat(key[None], self.chunk, axis=0)
+    chunk["prob"] = np.repeat(prob[None], self.chunk, axis=0)
     return chunk
 
   def _encode(self, key, index):
-    raw = uuid.UUID(key).bytes + index.to_bytes(8, 'big')
+    raw = uuid.UUID(key).bytes + index.to_bytes(8, "big")
     return np.frombuffer(raw, np.int64)
 
   def _decode(self, key):
     assert key.dtype == np.int64, key.dtype
     raw = key.tobytes()
     key = uuid.UUID(bytes=raw[:16]).hex
-    index = int.from_bytes(raw[16:], 'big')
+    index = int.from_bytes(raw[16:], "big")
     return key, index
 
   def _sync(self, interval):

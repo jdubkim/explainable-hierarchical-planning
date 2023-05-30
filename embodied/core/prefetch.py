@@ -25,9 +25,9 @@ class Prefetch:
         assignments[index % workers][0].append(source)
         assignments[index % workers][1].append(queue)
       import threading
+
       for args in assignments:
-        creator = threading.Thread(
-            target=self._creator, args=args, daemon=True)
+        creator = threading.Thread(target=self._creator, args=args, daemon=True)
         creator.start()
         self._creators.append(creator)
     else:
@@ -43,9 +43,10 @@ class Prefetch:
   def __iter__(self):
     if self._once:
       raise RuntimeError(
-          'You can only create one iterator per Batcher object to ensure that '
-          'data is consumed in order. You can create another Batcher object '
-          'instead.')
+          "You can only create one iterator per Batcher object to ensure that "
+          "data is consumed in order. You can create another Batcher object "
+          "instead."
+      )
     self._once = True
     return self
 

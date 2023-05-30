@@ -6,7 +6,6 @@ import shutil
 
 
 class Path:
-
   filesystems = []
 
   def __new__(cls, path):
@@ -16,24 +15,24 @@ class Path:
         obj = super().__new__(impl)
         obj.__init__(path)
         return obj
-    raise NotImplementedError(f'No filesystem supports: {path}')
+    raise NotImplementedError(f"No filesystem supports: {path}")
 
   def __getnewargs__(self):
     return (self._path,)
 
   def __init__(self, path):
     assert isinstance(path, str)
-    path = re.sub(r'^\./*', '', path)  # Remove leading dot or dot slashes.
-    path = re.sub(r'(?<=[^/])/$', '', path)  # Remove single trailing slash.
-    path = path or '.'  # Empty path is represented by a dot.
+    path = re.sub(r"^\./*", "", path)  # Remove leading dot or dot slashes.
+    path = re.sub(r"(?<=[^/])/$", "", path)  # Remove single trailing slash.
+    path = path or "."  # Empty path is represented by a dot.
     self._path = path
 
   def __truediv__(self, part):
-    sep = '' if self._path.endswith('/') else '/'
-    return type(self)(f'{self._path}{sep}{str(part)}')
+    sep = "" if self._path.endswith("/") else "/"
+    return type(self)(f"{self._path}{sep}{str(part)}")
 
   def __repr__(self):
-    return f'Path({str(self)})'
+    return f"Path({str(self)})"
 
   def __fspath__(self):
     return str(self)
@@ -49,38 +48,38 @@ class Path:
 
   @property
   def parent(self):
-    if '/' not in self._path:
-      return type(self)('.')
-    parent = self._path.rsplit('/', 1)[0]
-    parent = parent or ('/' if self._path.startswith('/') else '.')
+    if "/" not in self._path:
+      return type(self)(".")
+    parent = self._path.rsplit("/", 1)[0]
+    parent = parent or ("/" if self._path.startswith("/") else ".")
     return type(self)(parent)
 
   @property
   def name(self):
-    if '/' not in self._path:
+    if "/" not in self._path:
       return self._path
-    return self._path.rsplit('/', 1)[1]
+    return self._path.rsplit("/", 1)[1]
 
   @property
   def stem(self):
-    return self.name.split('.', 1)[0] if '.' in self.name else self.name
+    return self.name.split(".", 1)[0] if "." in self.name else self.name
 
   @property
   def suffix(self):
-    return ('.' + self.name.split('.', 1)[1]) if '.' in self.name else ''
+    return ("." + self.name.split(".", 1)[1]) if "." in self.name else ""
 
-  def read(self, mode='r'):
-    assert mode in 'r rb'.split(), mode
+  def read(self, mode="r"):
+    assert mode in "r rb".split(), mode
     with self.open(mode) as f:
       return f.read()
 
-  def write(self, content, mode='w'):
-    assert mode in 'w a wb ab'.split(), mode
+  def write(self, content, mode="w"):
+    assert mode in "w a wb ab".split(), mode
     with self.open(mode) as f:
       f.write(content)
 
   @contextlib.contextmanager
-  def open(self, mode='r'):
+  def open(self, mode="r"):
     raise NotImplementedError
 
   def absolute(self):
@@ -117,7 +116,7 @@ class LocalPath(Path):
     super().__init__(os.path.expanduser(str(path)))
 
   @contextlib.contextmanager
-  def open(self, mode='r'):
+  def open(self, mode="r"):
     with open(str(self), mode=mode) as f:
       yield f
 
@@ -125,7 +124,7 @@ class LocalPath(Path):
     return type(self)(os.path.absolute(str(self)))
 
   def glob(self, pattern):
-    for path in glob.glob(f'{str(self)}/{pattern}'):
+    for path in glob.glob(f"{str(self)}/{pattern}"):
       yield type(self)(path)
 
   def exists(self):
@@ -154,20 +153,21 @@ class GFilePath(Path):
 
   def __init__(self, path):
     path = str(path)
-    if not (path.startswith('/') or '://' in path):
+    if not (path.startswith("/") or "://" in path):
       path = os.path.abspath(os.path.expanduser(path))
     super().__init__(path)
     import tensorflow as tf
+
     self._gfile = tf.io.gfile
 
   @contextlib.contextmanager
-  def open(self, mode='r'):
+  def open(self, mode="r"):
     path = str(self)
-    if 'a' in mode and path.startswith('/cns/'):
-      path += '%r=3.2'
-    if mode.startswith('x') and self.exists():
+    if "a" in mode and path.startswith("/cns/"):
+      path += "%r=3.2"
+    if mode.startswith("x") and self.exists():
       raise FileExistsError(path)
-      mode = mode.replace('x', 'w')
+      mode = mode.replace("x", "w")
     with self._gfile.GFile(path, mode) as f:
       yield f
 
@@ -175,7 +175,7 @@ class GFilePath(Path):
     return self
 
   def glob(self, pattern):
-    for path in self._gfile.glob(f'{str(self)}/{pattern}'):
+    for path in self._gfile.glob(f"{str(self)}/{pattern}"):
       yield type(self)(path)
 
   def exists(self):
@@ -201,7 +201,7 @@ class GFilePath(Path):
 
 
 Path.filesystems = [
-    (GFilePath, lambda path: path.startswith('gs://')),
-    (GFilePath, lambda path: path.startswith('/cns/')),
+    (GFilePath, lambda path: path.startswith("gs://")),
+    (GFilePath, lambda path: path.startswith("/cns/")),
     (LocalPath, lambda path: True),
 ]

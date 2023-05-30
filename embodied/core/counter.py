@@ -8,7 +8,7 @@ class Counter:
     self.value = initial
 
   def __repr__(self):
-    return f'Counter({self.value})'
+    return f"Counter({self.value})"
 
   def __int__(self):
     return int(self.value)

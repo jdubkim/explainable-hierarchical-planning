@@ -1,5 +1,4 @@
 class Agent:
-
   configs = {}  # dict of dicts
 
   def __init__(self, obs_space, act_space, step, config):
@@ -7,26 +6,22 @@ class Agent:
 
   def dataset(self, generator_fn):
     # TODO: Go from iterable to iterable instead.
-    raise NotImplementedError(
-        'dataset(generator_fn) -> iterable')
+    raise NotImplementedError("dataset(generator_fn) -> iterable")
 
-  def policy(self, obs, state=None, mode='train'):
-    raise NotImplementedError(
-        "policy(obs, state=None, mode='train') -> act, state")
+  def policy(self, obs, state=None, mode="train"):
+    raise NotImplementedError("policy(obs, state=None, mode='train') -> act, state")
 
   def train(self, data, state=None):
-    raise NotImplementedError(
-        'train(data, state=None) -> outs, state, metrics')
+    raise NotImplementedError("train(data, state=None) -> outs, state, metrics")
 
   def report(self, data):
-    raise NotImplementedError(
-        'report(data) -> metrics')
+    raise NotImplementedError("report(data) -> metrics")
 
   def save(self):
-    raise NotImplementedError('save() -> data')
+    raise NotImplementedError("save() -> data")
 
   def load(self, data):
-    raise NotImplementedError('load(data) -> None')
+    raise NotImplementedError("load(data) -> None")
 
 
 class Env:
@@ -37,29 +32,30 @@ class Env:
 
   def __repr__(self):
     return (
-        f'{self.__class__.__name__}('
-        f'len={len(self)}, '
-        f'obs_space={self.obs_space}, '
-        f'act_space={self.act_space})')
+        f"{self.__class__.__name__}("
+        f"len={len(self)}, "
+        f"obs_space={self.obs_space}, "
+        f"act_space={self.act_space})"
+    )
 
   @property
   def obs_space(self):
     # The observation space must contain the keys is_first, is_last, and
     # is_terminal. Commonly, it also contains the keys reward and image. By
     # convention, keys starting with log_ are not consumed by the agent.
-    raise NotImplementedError('Returns: dict of spaces')
+    raise NotImplementedError("Returns: dict of spaces")
 
   @property
   def act_space(self):
     # The observation space must contain the keys action and reset. This
     # restriction may be lifted in the future.
-    raise NotImplementedError('Returns: dict of spaces')
+    raise NotImplementedError("Returns: dict of spaces")
 
   def step(self, action):
-    raise NotImplementedError('Returns: dict')
+    raise NotImplementedError("Returns: dict")
 
   def render(self):
-    raise NotImplementedError('Returns: array')
+    raise NotImplementedError("Returns: array")
 
   def close(self):
     pass
@@ -74,7 +70,7 @@ class Wrapper:
     return len(self.env)
 
   def __getattr__(self, name):
-    if name.startswith('__'):
+    if name.startswith("__"):
       raise AttributeError(name)
     try:
       return getattr(self.env, name)
@@ -85,20 +81,20 @@ class Wrapper:
 class Replay:
 
   def __len__(self):
-    raise NotImplementedError('Returns: total number of steps')
+    raise NotImplementedError("Returns: total number of steps")
 
   @property
   def stats(self):
-    raise NotImplementedError('Returns: metrics')
+    raise NotImplementedError("Returns: metrics")
 
   def add(self, transition, worker=0):
-    raise NotImplementedError('Returns: None')
+    raise NotImplementedError("Returns: None")
 
   def add_traj(self, trajectory):
-    raise NotImplementedError('Returns: None')
+    raise NotImplementedError("Returns: None")
 
   def dataset(self):
-    raise NotImplementedError('Yields: trajectory')
+    raise NotImplementedError("Yields: trajectory")
 
   def prioritize(self, keys, priorities):
     pass

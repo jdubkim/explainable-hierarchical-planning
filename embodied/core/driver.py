@@ -7,7 +7,6 @@ from .convert import convert
 
 
 class Driver:
-
   _CONVERSION = {
       np.floating: np.float32,
       np.signedinteger: np.int32,
@@ -28,7 +27,7 @@ class Driver:
         k: convert(np.zeros((len(self._env),) + v.shape, v.dtype))
         for k, v in self._env.obs_space.items()
     }
-    self._obs['is_last'] = np.ones(len(self._env), bool)
+    self._obs["is_last"] = np.ones(len(self._env), bool)
     self._eps = [collections.defaultdict(list) for _ in range(len(self._env))]
     self._state = None
 
@@ -49,16 +48,16 @@ class Driver:
     """
     # Gets the next action and the next state from policy.
     acts, self._state = policy(self._obs, self._state, **self._kwargs)
-        
+
     # Initialize the reset action.
-    acts['reset'] = np.zeros(len(self._env), bool)
+    acts["reset"] = np.zeros(len(self._env), bool)
     # If the episode is over, reset the environment.
-    if self._obs['is_last'].any():
+    if self._obs["is_last"].any():
       acts = {
-          k: v * self._expand(1 - self._obs['is_last'], len(v.shape))
+          k: v * self._expand(1 - self._obs["is_last"], len(v.shape))
           for k, v in acts.items()
       }
-      acts['reset'] = self._obs['is_last']
+      acts["reset"] = self._obs["is_last"]
     acts = {k: convert(v) for k, v in acts.items()}
     assert all(len(x) == len(self._env) for x in acts.values()), acts
     # Step the environment.
@@ -68,8 +67,8 @@ class Driver:
 
     trns = {**self._obs, **acts}
     # If the episode is over, clear the episode buffer.
-    if self._obs['is_first'].any():
-      for i, first in enumerate(self._obs['is_first']):
+    if self._obs["is_first"].any():
+      for i, first in enumerate(self._obs["is_first"]):
         if not first:
           continue
         self._eps[i].clear()
@@ -85,8 +84,8 @@ class Driver:
 
     # If the episode is over, call the episode callback with the episode buffer,
     # the environment index and the keyword arguments.
-    if self._obs['is_last'].any():
-      for i, done in enumerate(self._obs['is_last']):
+    if self._obs["is_last"].any():
+      for i, done in enumerate(self._obs["is_last"]):
         if not done:
           continue
         ep = {k: convert(v) for k, v in self._eps[i].items()}

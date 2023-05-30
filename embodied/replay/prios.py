@@ -17,9 +17,9 @@ class Priorities:
     self.keys = None
     self.lock = threading.Lock()
     self.metrics = {
-        'samples': collections.defaultdict(int),
-        'update_min': np.inf,
-        'update_max': -np.inf,
+        "samples": collections.defaultdict(int),
+        "update_min": np.inf,
+        "update_max": -np.inf,
     }
 
   def __contains__(self, key):
@@ -36,14 +36,14 @@ class Priorities:
       self._ensure()
       entropy = -(self.probs @ np.log(self.probs)).item()
       maximum = np.log(len(self.probs))
-    samples = list(self.metrics['samples'].values()) or [0]
+    samples = list(self.metrics["samples"].values()) or [0]
     return {
-        'randomness': entropy / maximum,
-        'seen_frac': len(self.metrics['samples']) / len(self.entries),
-        'seen_max': max(samples),
-        'sample_frac': sum(samples) / len(self.entries),
-        'update_min': self.metrics['update_min'],
-        'update_max': self.metrics['update_max'],
+        "randomness": entropy / maximum,
+        "seen_frac": len(self.metrics["samples"]) / len(self.entries),
+        "seen_max": max(samples),
+        "sample_frac": sum(samples) / len(self.entries),
+        "update_min": self.metrics["update_min"],
+        "update_max": self.metrics["update_max"],
     }
 
   def sample(self):
@@ -60,7 +60,7 @@ class Priorities:
       entry = self.entries[key]
       index = self.random.choice(len(entry.probs), p=entry.probs)
       prob *= entry.probs[index]
-    self.metrics['samples'][key] += 1
+    self.metrics["samples"][key] += 1
     return key, index, prob
 
   def add(self, key, prios):
@@ -73,11 +73,11 @@ class Priorities:
 
   def update(self, key, index, prios):
     assert prios.dtype == np.float64, prios.dtype
-    self.metrics['update_min'] = min(self.metrics['update_min'], prios.min())
-    self.metrics['update_max'] = max(self.metrics['update_max'], prios.max())
+    self.metrics["update_min"] = min(self.metrics["update_min"], prios.min())
+    self.metrics["update_max"] = max(self.metrics["update_max"], prios.max())
     try:
       entry = self.entries[key]
-      entry.steps[index: index + len(prios)] = prios
+      entry.steps[index : index + len(prios)] = prios
       self._precompute(entry)
     except (KeyError, IndexError):
       raise KeyError
@@ -85,21 +85,21 @@ class Priorities:
       self.probs = None
 
   def remove(self, key):
-    self.metrics['samples'].pop(key, None)
+    self.metrics["samples"].pop(key, None)
     with self.lock:
       del self.entries[key]
       self.probs = None
 
   def save(self):
     return {
-        'entries': self.entries.copy(),
-        'metrics': self.metrics,
+        "entries": self.entries.copy(),
+        "metrics": self.metrics,
     }
 
   def load(self, data):
     with self.lock:
-      self.metrics = data['metrics']
-      self.entries.update(data['entries'])
+      self.metrics = data["metrics"]
+      self.entries.update(data["entries"])
       self.probs = None
 
   def _precompute(self, entry):
@@ -143,8 +143,7 @@ class Priorities:
 
 
 class Entry:
-
-  __slots__ = ('steps', 'probs', 'total')
+  __slots__ = ("steps", "probs", "total")
 
   def __init__(self, steps, probs=None, total=None):
     self.steps = steps

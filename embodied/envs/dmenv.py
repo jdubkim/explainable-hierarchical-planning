@@ -19,13 +19,13 @@ class DMEnv(embodied.Env):
   def obs_space(self):
     spec = self._env.observation_spec()
     spec = spec if self._obs_dict else {spec.name: spec}
-    if 'reward' in spec:
-      spec['obs_reward'] = spec.pop('reward')
+    if "reward" in spec:
+      spec["obs_reward"] = spec.pop("reward")
     return {
-        'reward': embodied.Space(np.float32),
-        'is_first': embodied.Space(bool),
-        'is_last': embodied.Space(bool),
-        'is_terminal': embodied.Space(bool),
+        "reward": embodied.Space(np.float32),
+        "is_first": embodied.Space(bool),
+        "is_last": embodied.Space(bool),
+        "is_terminal": embodied.Space(bool),
         **{k: self._convert(v) for k, v in spec.items()},
     }
 
@@ -34,13 +34,13 @@ class DMEnv(embodied.Env):
     spec = self._env.action_spec()
     spec = spec if self._act_dict else {spec.name: spec}
     return {
-        'reset': embodied.Space(bool),
+        "reset": embodied.Space(bool),
         **{k: self._convert(v) for k, v in spec.items()},
     }
 
   def step(self, action):
     action = action.copy()
-    reset = action.pop('reset')
+    reset = action.pop("reset")
     if reset or self._done:
       time_step = self._env.reset()
     else:
@@ -54,8 +54,8 @@ class DMEnv(embodied.Env):
       assert time_step.discount in (0, 1), time_step.discount
     obs = time_step.observation
     obs = obs if self._obs_dict else {self._obs_key: obs}
-    if 'reward' in obs:
-      obs['obs_reward'] = obs.pop('reward')
+    if "reward" in obs:
+      obs["obs_reward"] = obs.pop("reward")
     return dict(
         reward=0.0 if time_step.first() else time_step.reward,
         is_first=time_step.first(),
@@ -65,8 +65,7 @@ class DMEnv(embodied.Env):
     )
 
   def _convert(self, space):
-    if hasattr(space, 'num_values'):
+    if hasattr(space, "num_values"):
       return embodied.Space(space.dtype, (), 0, space.num_values)
     else:
-      return embodied.Space(
-          space.dtype, space.shape, space.minimum, space.maximum)
+      return embodied.Space(space.dtype, space.shape, space.minimum, space.maximum)

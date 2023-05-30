@@ -25,7 +25,9 @@ class BatchEnv(base.Env):
 
   def step(self, action):
     assert all(len(v) == len(self._envs) for v in action.values()), (
-        len(self._envs), {k: v.shape for k, v in action.items()})
+        len(self._envs),
+        {k: v.shape for k, v in action.items()},
+    )
     obs = []
     for i, env in enumerate(self._envs):
       act = {k: v[i] for k, v in action.items()}

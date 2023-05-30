@@ -12,16 +12,16 @@ class Space:
     self.low = self._infer_low(dtype, shape, low, high)
     self.high = self._infer_high(dtype, shape, low, high)
     self.shape = self._infer_shape(dtype, shape, low, high)
-    self.discrete = (
-        np.issubdtype(self.dtype, np.integer) or self.dtype == bool)
+    self.discrete = np.issubdtype(self.dtype, np.integer) or self.dtype == bool
     self._random = np.random.RandomState()
 
   def __repr__(self):
     return (
-        f'Space(dtype={self.dtype.name}, '
-        f'shape={self.shape}, '
-        f'low={self.low.min()}, '
-        f'high={self.high.max()})')
+        f"Space(dtype={self.dtype.name}, "
+        f"shape={self.shape}, "
+        f"low={self.low.min()}, "
+        f"high={self.high.max()})"
+    )
 
   def __contains__(self, value):
     if not isinstance(value, np.ndarray):
@@ -52,7 +52,7 @@ class Space:
       elif np.issubdtype(dtype, bool):
         low = np.zeros(shape, bool)
       else:
-        raise ValueError('Cannot infer low bound from shape and dtype.')
+        raise ValueError("Cannot infer low bound from shape and dtype.")
     return np.array(low)
 
   def _infer_high(self, dtype, shape, low, high):
@@ -64,7 +64,7 @@ class Space:
       elif np.issubdtype(dtype, bool):
         high = np.ones(shape, bool)
       else:
-        raise ValueError('Cannot infer high bound from shape and dtype.')
+        raise ValueError("Cannot infer high bound from shape and dtype.")
     return np.array(high)
 
   def _infer_shape(self, dtype, shape, low, high):
@@ -72,7 +72,7 @@ class Space:
       shape = low.shape
     if shape is None and high is not None:
       shape = high.shape
-    if not hasattr(shape, '__len__'):
+    if not hasattr(shape, "__len__"):
       shape = (shape,)
     assert all(dim and dim > 0 for dim in shape), shape
     return tuple(shape)
