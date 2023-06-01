@@ -207,6 +207,7 @@ class WandbOutput(TensorBoardOutput):
       self._writer = wandb.init(
           dir=self._logdir,
           config=self.config,
+          name=self.config.wandb_runname,
           project=self.project_name,
           job_type="logging",
       )

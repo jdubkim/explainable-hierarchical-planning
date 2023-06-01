@@ -412,6 +412,44 @@ class ImagActorCritic(tfutils.Module):
     return loss, metrics
 
 
+class Termination(tfutils.Module):
+
+  def __init__(self, config):
+    self.config = config
+    self.net = nets.MLP((), **self.config.term)
+    self.opt = tfutils.Optimizer("term", **self.config.term_opt)
+    self.threshold = tf.Variable(
+        self.config.term_threshold, trainable=False, dtype=tf.float32
+    )
+
+  def predict(self, traj):
+    return self.net(traj) > self.threshold
+
+  def update(self, traj, tape=None):
+    tape = tape or tf.GradientTape()
+    metrics = {}
+    with tape:
+      pred = self.net(traj)
+      loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=traj["term"], logits=pred)
+      loss *= tf.stop_gradient(traj["weight"])
+      loss = loss.mean()
+    metrics.update(self.opt(tape, loss, self.net))
+    return metrics
+
+  def train(self, traj, actor):
+    metrics = {}
+    with tf.GradientTape() as tape:
+      pred = self.net(traj)
+      loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=traj["term"], logits=pred)
+      loss *= tf.stop_gradient(traj["weight"])
+      loss = loss.mean()
+    metrics.update(self.opt(tape, loss, self.net))
+    return metrics
+
+  def loss(self, traj, term):
+    pass
+
+
 class VFunction(tfutils.Module):
 
   def __init__(self, rewfn, config):

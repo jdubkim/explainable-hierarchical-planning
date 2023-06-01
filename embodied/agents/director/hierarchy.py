@@ -85,6 +85,7 @@ class Hierarchy(tfutils.Module):
     self.dec = nets.MLP(self.goal_shape, dims="context", **self.config.goal_decoder)
     self.kl = tfutils.AutoAdapt((), **self.config.encdec_kl)
     self.opt = tfutils.Optimizer("goal", **config.encdec_opt)
+    self.termination = agent.Termination(config)
 
   def initial(self, batch_size):
     return {
@@ -94,11 +95,20 @@ class Hierarchy(tfutils.Module):
     }
 
   def policy(self, latent, carry, imag=False):
+    # Carry keys:  dict_keys(['step', 'skill', 'goal'])
+    # Latent keys:  dict_keys(['deter', 'logit', 'stoch'])
+    # Goal and deter are same shape
+
     duration = (
         self.config.train_skill_duration if imag else (self.config.env_skill_duration)
     )
     sg = lambda x: tf.nest.map_structure(tf.stop_gradient, x)
-    update = (carry["step"] % duration) == 0
+    # update = (carry["step"] % duration) == 0
+    terminate = self.termination.predict({
+        "goal": carry["goal"],
+        "feat": self.feat(latent),
+    })
+    update = tf.logical_or(terminate, (carry["step"] % duration) == 0)
     switch = lambda x, y: (
         tf.einsum("i,i...->i...", 1 - update.astype(x.dtype), x)
         + tf.einsum("i,i...->i...", update.astype(x.dtype), y)
