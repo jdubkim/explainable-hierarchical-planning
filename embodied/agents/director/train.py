@@ -51,7 +51,7 @@ def main(argv=None):
     output_list = [
         embodied.logger.TerminalOutput(config.filter),
         embodied.logger.JSONLOutput(actordir, 'metrics.jsonl'),
-        embodied.logger.TensorBoardOutput(actordir),
+        embodied.logger.TensorBoardOutput(actordir, config.fps),
     ]
     if config.wandb:
         output_list.append(embodied.logger.WandbOutput(actordir, config))
@@ -61,7 +61,7 @@ def main(argv=None):
     output_list = [
         embodied.logger.TerminalOutput(config.filter),
         embodied.logger.JSONLOutput(logdir, 'metrics.jsonl'),
-        embodied.logger.TensorBoardOutput(logdir),
+        embodied.logger.TensorBoardOutput(logdir, config.fps),
     ]
     if config.wandb:
         output_list.append(embodied.logger.WandbOutput(logdir, config))

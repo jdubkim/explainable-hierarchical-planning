@@ -3,7 +3,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jk3417
 #SBATCH --output=/vol/bitbucket/jk3417/explainable-mbhrl/slurm_outputs/director_result_%j.out
-#SBATCH --partition=gpgpuB,gpgpuC
+#SBATCH --partition=gpgpuB
 export PATH=/vol/bitbucket/jk3417/xmbhrl/bin/:$PATH
 source activate
 

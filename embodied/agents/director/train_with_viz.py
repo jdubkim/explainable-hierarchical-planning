@@ -36,8 +36,7 @@ def train_with_viz(agent, env, train_replay, eval_replay, logger, args):
     logs = {}
     should_video_now = should_video(step)
     if not should_video_now:
-      full_render = ep.pop('full_render')
-      del full_render
+      ep.pop('full_render', None)
     for key, value in ep.items():
       if not args.log_zeros and key not in nonzeros and (value == 0).all():
         continue

@@ -146,7 +146,7 @@ class JSONLOutput(AsyncOutput):
 
 class TensorBoardOutput(AsyncOutput):
 
-  def __init__(self, logdir, fps=2, parallel=True):
+  def __init__(self, logdir, fps=20, parallel=True):
     super().__init__(self._write, parallel)
     self._logdir = str(logdir)
     if self._logdir.startswith('/gcs/'):
@@ -190,17 +190,19 @@ class TensorBoardOutput(AsyncOutput):
 
 
 class WandbOutput(TensorBoardOutput):
-    def __init__(self, logdir, config, fps=2, parallel=True):
-        super().__init__(logdir, fps, parallel)
+    def __init__(self, logdir, config, parallel=True):
+        super().__init__(logdir, config.fps, parallel)
         self.config = config
         env_name = config['task'].split('_')[-1]
         self.project_name = f'EHP-{env_name}'
+        self.name = config.wandb_runname
     
     def _write(self, summaries):
         import wandb
         if not self._writer:
             self._writer = wandb.init(
-                dir=self._logdir, config=self.config, project=self.project_name, job_type='logging')
+                dir=self._logdir, config=self.config, name=self.name,
+                project=self.project_name, job_type='logging')
         for step, name, value in summaries:
             if len(value.shape) == 0:
                 self._writer.log({name: value}, step=step)
