@@ -336,6 +336,10 @@ class ImagActorCritic(tfutils.Module):
                 self.config.goal_regularisation_weight,
                 trainable=False,
                 dtype=tf.float32)
+            if self.config.goal_reg_target == 'baseline':
+              self.target_index = 1
+            else:
+              self.target_index = 0
 
     def initial(self, batch_size):
         return None
@@ -389,16 +393,14 @@ class ImagActorCritic(tfutils.Module):
         else:
             raise NotImplementedError(self.grad)
         
-        # print("Manager" if self.config.is_manager else "Worker")
-        # print("Trajectory keys...", traj.keys())
-        # if traj.get('skill') is not None:
-        #     print("skill shape: ", traj['skill'].shape)
-        # print("Goal shape: ", traj['goal'].shape)
-        # print("Loss shape: ", loss.shape)
         # Regularise the goal prediction loss using critics
         if self.config.is_manager and self.config.goal_regularised:
-            goal_loss = self.critics['expl'].score(traj, self.actor)[1:]
-            loss -= goal_loss * self.goal_regularisation_weight
+          goal_losses = []
+          for key, critic in self.critics.items():
+            goal_losses.append(critic.score(traj, self.actor)[self.target_index])
+          goal_loss = tf.reduce_sum(goal_losses, 0)
+          loss -= self.goal_regularisation_weight * goal_loss
+          # loss += self.goal_regularisation_weight * tf.stop_gradient(score)
 
         shape = (self.act_space.shape[:-1]
                  if self.act_space.discrete else self.act_space.shape)
@@ -504,9 +506,9 @@ class VFunction(tfutils.Module):
 
 class QFunction(tfutils.Module):
     def __init__(self, rewfn, config):
-        assert config.actor_grad_disc == 'backprop'
-        assert config.actor_grad_cont == 'backprop'
-        assert 'action' in config.actor.inputs
+      # assert config.actor_grad_disc == 'backprop'
+        # assert config.actor_grad_cont == 'backprop'
+        # assert 'action' in config.actor.inputs
         self.rewfn = rewfn
         self.config = config
         self.net = nets.MLP((), **self.config.critic)

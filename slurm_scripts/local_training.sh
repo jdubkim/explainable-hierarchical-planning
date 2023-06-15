@@ -3,7 +3,6 @@ source /vol/cuda/11.3.1-cudnn8.2.1/setup.sh
 export XLA_FLAGS=--xla_gpu_cuda_data_dir=/vol/cuda/11.3.1-cudnn8.2.1
 /usr/bin/nvidia-smi
 
-conda init bash && conda activate xhp
 echo $(which python3)
 
 echo "Using config: $1."
