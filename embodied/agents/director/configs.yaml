@@ -16,6 +16,7 @@ defaults:
   replay_prio: {prio_starts: 0.0, prio_ends: 1.0, sync: 0, fraction: 0.1, softmax: False, temp: 1.0, constant: 0.0, exponent: 0.5}
   tf: {jit: True, platform: gpu, precision: 16, debug_nans: False, logical_gpus: 0, dist_dataset: False, dist_policy: False, tensorfloat: True, placement: False, growth: True}
   wandb: True
+  log_enc: True
   wandb_runname: None
   eval_dir: ''
   filter: '.*'
@@ -225,10 +226,10 @@ minigridImage:
   fps: 1
 
   train:
-    steps: 5e5
-    eval_every: 2e4
-    train_fill: 1e4
-    eval_fill: 1e4
+    steps: 1e3
+    eval_every: 1e3
+    train_fill: 1e2
+    eval_fill: 1e2
     log_keys_video: [image, full_render]
 
 debug:
