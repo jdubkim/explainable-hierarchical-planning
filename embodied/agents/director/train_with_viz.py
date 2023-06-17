@@ -136,18 +136,16 @@ def train_with_viz(
   final_eval_directory = logdir / "final_eval"
   # Create directory
   os.makedirs(final_eval_directory, exist_ok=True)
-  episode_n = 1
+  episode_n = embodied.Counter()
 
   def final_eval_step(tran, worker):
     eval_step.increment()
     final_eval_replay.add(tran)
 
   def final_on_episode(ep, worker):
-    print(f"Final evaluation episode has {len(ep['reward'])} steps.")
-    print("Episode")
+    episode_n.increment()
     # Save the episode to a npz file.
-    np.savez_compressed(final_eval_directory / f"ep_{episode_n}.npz", **ep)
-    episode_n += 1
+    np.savez_compressed(final_eval_directory / f"ep_{episode_n.value}.npz", **ep)
 
   final_eval_driver = embodied.Driver(env)
   # final_eval_driver.on_step(final_eval_step)
