@@ -35,8 +35,9 @@ Some of the Results of Our Work
 
 Our changes enable Director to perform well on DM Control Suite - SwingUp task. 
 
-![Director](https://github.com/jdubkim/explainable-hierarchical-planning/blob/main/data/pendulum/director.gif)
-![Our new agent](https://github.com/jdubkim/explainable-hierarchical-planning/blob/main/data/pendulum/regularised.gif)
+Left: Director, Right: Our agent
+
+<img src="https://github.com/jdubkim/explainable-hierarchical-planning/blob/main/data/pendulum/director.gif" width="200" height="100"/> <img src="https://github.com/jdubkim/explainable-hierarchical-planning/blob/main/data/pendulum/regularised.gif" width="200" height="100"/>
 
 The below is a visualisation of internal goals. 
 
