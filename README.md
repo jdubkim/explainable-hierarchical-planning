@@ -1,22 +1,46 @@
-Deep Hierarchical Planning from Pixels
+Explainable Reinforcement Learning: A Hierarchical Planning Approach
 ======================================
 
-Official implementation of the [Director][project] algorithm in TensorFlow 2.
+This is based on the official implementation of the [Director][project] algorithm in TensorFlow 2.
 
 [project]: https://danijar.com/director/
 
 ![Director Internal Goals](https://github.com/danijar/director/raw/main/media/header.gif)
 
-If you find this code useful, please reference in your paper:
+Running the Agent
+-----------------
 
+Follow the instructions below.
+
+Install dependencies:
+
+```sh
+pip install -r requirements.txt
 ```
-@article{hafner2022director,
-  title={Deep Hierarchical Planning from Pixels},
-  author={Hafner, Danijar and Lee, Kuang-Huei and Fischer, Ian and Abbeel, Pieter},
-  journal={Advances in Neural Information Processing Systems},
-  year={2022}
-}
+
+Train agent:
+
+```sh
+python embodied/agents/director/train.py \
+  --logdir ~/logdir/$(date +%Y%m%d-%H%M%S) \
+  --configs dmc_vision \
+  --task dmc_swingup
 ```
+
+See `agents/director/configs.yaml` for available flags and
+`embodied/envs/__init__.py` for available envs.
+
+Some of the Results of Our Work
+-----------------------
+
+Our changes enable Director to perform well on DM Control Suite - SwingUp task. 
+
+![Director](https://github.com/jdubkim/explainable-hierarchical-planning/blob/main/data/pendulum/director.gif)
+![Our new agent](https://github.com/jdubkim/explainable-hierarchical-planning/blob/main/data/pendulum/regularised.gif)
+
+The below is a visualisation of internal goals. 
+
+![pendulum-swingup](https://github.com/jdubkim/explainable-hierarchical-planning/blob/main/data/pendulum/pendulum_viz.png)
 
 How does Director work?
 -----------------------
@@ -39,31 +63,4 @@ For more information:
 - [Project website](https://danijar.com/project/director/)
 - [Research paper](https://arxiv.org/pdf/2206.04114.pdf)
 
-Running the Agent
------------------
 
-Either use `embodied/Dockerfile` or follow the manual instructions below.
-
-Install dependencies:
-
-```sh
-pip install -r requirements.txt
-```
-
-Train agent:
-
-```sh
-python embodied/agents/director/train.py \
-  --logdir ~/logdir/$(date +%Y%m%d-%H%M%S) \
-  --configs dmc_vision \
-  --task dmc_walker_walk
-```
-
-See `agents/director/configs.yaml` for available flags and
-`embodied/envs/__init__.py` for available envs.
-
-Using the Tasks
----------------
-
-The HRL environments are in `embodied/envs/pinpad.py` and
-`embodied/envs/loconav.py`.
